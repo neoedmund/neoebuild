@@ -51,6 +51,7 @@ as you can see, you can use
 
   - `dep:[]` for dependency on other projects.
   - `cp:[]` for jar in classpath
+  - `main:class-name` for main-class in jar
   - `run:[[class, method, [params]]]` for customized program to run while building
   - the build result jars will be copied into `destDir`
   - `prjs` format is `[name, dir, options]` 
