@@ -183,7 +183,7 @@ public class BuildMain {
 				Java run = new Java();
 				cp.add(new Path(project, jarFile.getAbsolutePath()));
 				run.setError(new File("error.log"));
-				run.setClasspath(cp);	
+				run.setClasspath(cp);
 				run.setProject(project);
 				for (Object o : prj.run) {
 					List row = (List) o;
@@ -333,14 +333,38 @@ public class BuildMain {
 		}
 
 	}
+	static Map makeDefaultEmptyConfig() throws Exception {
+		File dir = new File(".");
+		log("Current Dir:"+ dir.getAbsolutePath());
+		File srcDir = new File(dir, "src");
+		if (srcDir.exists() && srcDir.isDirectory()){
 
+		}else{
+			log("'src' dir not found, exiting...");
+			return null;
+		}
+		String prjName = dir.getCanonicalFile().getName();
+		log("user default project name:"+prjName);
+		Map m = new HashMap();
+		m.put("baseDir", ".");
+		m.put("destDir", ".");
+		m.put("debug", "true");
+		m.put("prjs", (List)  PyData.parseAll(String.format("[ [ %s , . ],  ]" , prjName) ));
+		return m;
+	}
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("neoebuild v1.2.1 20141015");
-		Map param = (Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8"));
+		System.out.println("neoebuild v1.3 20141121");
+		Map param = null;
+		if (args.length==0){
+			param = makeDefaultEmptyConfig();
+			if (param==null) return;
+		} else{
+			param = (Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8"));
+		}
 		System.out.println(param);
 		String pb1 = (String) param.get("baseDir");
 		String destDir = (String) param.get("destDir");
