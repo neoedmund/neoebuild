@@ -103,7 +103,9 @@ public class BuildMain {
 				}
 				for (Thread t : ts) {
 					t.join();
-					if (!success.get(t.getId())) {
+					Boolean succ = success.get(t.getId());
+					if (succ==null) succ=false;
+					if (!succ) {
 						log("build fail");
 						throw new RuntimeException("build failed");
 					}
@@ -357,13 +359,12 @@ public class BuildMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("neoebuild v1.3 20141121");
-		Map param = null;
-		if (args.length==0){
-			param = makeDefaultEmptyConfig();
+		System.out.println("neoebuild v1.4 20150109");
+		Map param = makeDefaultEmptyConfig();
+		if (args.length==0){			
 			if (param==null) return;
 		} else{
-			param = (Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8"));
+			param.putAll( (Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8")) );
 		}
 		System.out.println(param);
 		String pb1 = (String) param.get("baseDir");
