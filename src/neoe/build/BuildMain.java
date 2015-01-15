@@ -125,10 +125,14 @@ public class BuildMain {
 			project.setName(prjName);
 			Javac javac = new Javac();
 			javac.setProject(project);
-			javac.setTarget(getParam("target", "1.5"));
-			javac.setSource(getParam("source", "1.5"));
+			javac.setTarget(getParam("target", "1.6"));
+			javac.setSource(getParam("source", "1.6"));
 			javac.setEncoding(getParam("encoding", "utf-8"));
 			javac.setDebug(new Boolean(getParam("debug", "false")));
+			File srcDir = new File(path.getAbsolutePath() , "/src");
+			if (!srcDir.exists()){ // check /src
+				throw new RuntimeException("src dir not found:"+srcDir.getAbsolutePath());
+			}
 			javac.setSrcdir(new Path(project, path.getAbsolutePath() + "/src"));
 			File buildDir = new File(path.getAbsolutePath() + "/build");
 			buildDir.mkdirs();
@@ -234,7 +238,7 @@ public class BuildMain {
 		}
 
 		public void copyTo(Prj prj, String dest) {
-			File destDir = new File(dest);
+			File destDir = new File(prjs.baseDir, dest);
 			destDir.mkdirs();
 			// for (Prj prj : prjs.m.values()) {
 			String path = addPath(prjs.baseDir, prj.dir).getAbsolutePath();
@@ -359,7 +363,7 @@ public class BuildMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("neoebuild v1.4 20150109");
+		System.out.println("neoebuild v1.4 20150112");
 		Map param = makeDefaultEmptyConfig();
 		if (args.length==0){			
 			if (param==null) return;
