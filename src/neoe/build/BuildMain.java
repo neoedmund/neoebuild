@@ -139,8 +139,20 @@ public class BuildMain {
 			javac.setDestdir(buildDir);
 			Path cp = new Path(project);
 			if (prj.cp != null) {
-				for (Object o : prj.cp) {
-					cp.add(new Path(project, addPath(prjs.baseDir, o.toString()).getAbsolutePath()));
+				for (Object o : prj.cp) {					
+					File f1 =  addPath(prjs.baseDir, o.toString());
+					if (f1.isDirectory()){
+						// v1.5 : cp can be dir ,eg lib dir
+						File[] fs = f1.listFiles();
+						for (File f: fs) {
+							if (f.getName().endsWith(".jar")) {
+								//System.out.println("[D]add "+f.getAbsolutePath());
+								cp.add(new Path(project,f.getAbsolutePath()));
+							}
+						}
+					} else {
+						cp.add(new Path(project, addPath(prjs.baseDir, o.toString()).getAbsolutePath()));
+					}	
 				}
 			}
 			if (prj.depends != null) {
@@ -151,8 +163,10 @@ public class BuildMain {
 
 				}
 			}
-			System.out.println(cp);
+			//System.out.println(cp);
 			javac.setClasspath(cp);
+			//javac.setCompiler("javac1.7");
+			//javac.setFork(true);
 			javac.execute();
 			if (javac.getFileList().length == 0) {
 				log(prjName + ":no more to compile");
@@ -238,7 +252,7 @@ public class BuildMain {
 		}
 
 		public void copyTo(Prj prj, String dest) {
-			File destDir = new File(prjs.baseDir, dest);
+			File destDir = addPath(prjs.baseDir, dest);
 			destDir.mkdirs();
 			// for (Prj prj : prjs.m.values()) {
 			String path = addPath(prjs.baseDir, prj.dir).getAbsolutePath();
@@ -252,8 +266,18 @@ public class BuildMain {
 			if (prj.cp != null)
 				for (Object o : prj.cp) {
 					// also copy cp jars
-					copy.setFile(addPath(prjs.baseDir, o.toString()));
-					copy.execute();
+					File f = addPath(prjs.baseDir, o.toString());
+					if (f.isDirectory()) { //v1.5
+						for (File f1 : f.listFiles()){
+							if (f1.getName().endsWith(".jar")) {
+								copy.setFile(f1);
+								copy.execute();
+							}
+						}
+					}else {
+						copy.setFile(f);
+						copy.execute();
+					}	
 				}
 		}
 	}
@@ -363,11 +387,13 @@ public class BuildMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("neoebuild v1.4 20150112");
-		Map param = makeDefaultEmptyConfig();
-		if (args.length==0){			
+		System.out.println("neoebuild v1.5.1 20150516");
+		Map param = null;
+		if (args.length==0){
+			param=makeDefaultEmptyConfig();
 			if (param==null) return;
 		} else{
+			param = new HashMap();
 			param.putAll( (Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8")) );
 		}
 		System.out.println(param);
