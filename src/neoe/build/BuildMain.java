@@ -21,7 +21,6 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.taskdefs.Javac;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.Manifest.Attribute;
-import org.apache.tools.ant.types.Commandline.Argument;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 
@@ -104,9 +103,10 @@ public class BuildMain {
 				for (Thread t : ts) {
 					t.join();
 					Boolean succ = success.get(t.getId());
-					if (succ==null) succ=false;
+					if (succ == null)
+						succ = false;
 					if (!succ) {
-						log("build fail");
+						log("build fail:"+t.getId());
 						throw new RuntimeException("build failed");
 					}
 				}
@@ -129,9 +129,9 @@ public class BuildMain {
 			javac.setSource(getParam("source", "1.6"));
 			javac.setEncoding(getParam("encoding", "utf-8"));
 			javac.setDebug(new Boolean(getParam("debug", "false")));
-			File srcDir = new File(path.getAbsolutePath() , "/src");
-			if (!srcDir.exists()){ // check /src
-				throw new RuntimeException("src dir not found:"+srcDir.getAbsolutePath());
+			File srcDir = new File(path.getAbsolutePath(), "/src");
+			if (!srcDir.exists()) { // check /src
+				throw new RuntimeException("src dir not found:" + srcDir.getAbsolutePath());
 			}
 			javac.setSrcdir(new Path(project, path.getAbsolutePath() + "/src"));
 			File buildDir = new File(path.getAbsolutePath() + "/build");
@@ -139,20 +139,21 @@ public class BuildMain {
 			javac.setDestdir(buildDir);
 			Path cp = new Path(project);
 			if (prj.cp != null) {
-				for (Object o : prj.cp) {					
-					File f1 =  addPath(prjs.baseDir, o.toString());
-					if (f1.isDirectory()){
+				for (Object o : prj.cp) {
+					File f1 = addPath(prjs.baseDir, o.toString());
+					if (f1.isDirectory()) {
 						// v1.5 : cp can be dir ,eg lib dir
 						File[] fs = f1.listFiles();
-						for (File f: fs) {
+						for (File f : fs) {
 							if (f.getName().endsWith(".jar")) {
-								//System.out.println("[D]add "+f.getAbsolutePath());
-								cp.add(new Path(project,f.getAbsolutePath()));
+								// System.out.println("[D]add
+								// "+f.getAbsolutePath());
+								cp.add(new Path(project, f.getAbsolutePath()));
 							}
 						}
 					} else {
 						cp.add(new Path(project, addPath(prjs.baseDir, o.toString()).getAbsolutePath()));
-					}	
+					}
 				}
 			}
 			if (prj.depends != null) {
@@ -163,10 +164,10 @@ public class BuildMain {
 
 				}
 			}
-			//System.out.println(cp);
+			// System.out.println(cp);
 			javac.setClasspath(cp);
-			//javac.setCompiler("javac1.7");
-			//javac.setFork(true);
+			// javac.setCompiler("javac1.7");
+			// javac.setFork(true);
 			javac.execute();
 			if (javac.getFileList().length == 0) {
 				log(prjName + ":no more to compile");
@@ -199,7 +200,7 @@ public class BuildMain {
 			// log(prjName+":build finish");
 			copyTo(prj, destDir);
 
-			if (prj.run != null){
+			if (prj.run != null) {
 				Java run = new Java();
 				cp.add(new Path(project, jarFile.getAbsolutePath()));
 				run.setError(new File("error.log"));
@@ -208,7 +209,7 @@ public class BuildMain {
 				for (Object o : prj.run) {
 					List row = (List) o;
 					run.setClassname((String) row.get(0));
-					for (Object o1:(List)row.get(2)){
+					for (Object o1 : (List) row.get(2)) {
 						run.createArg().setValue(o1.toString());
 					}
 					run.execute();
@@ -267,17 +268,17 @@ public class BuildMain {
 				for (Object o : prj.cp) {
 					// also copy cp jars
 					File f = addPath(prjs.baseDir, o.toString());
-					if (f.isDirectory()) { //v1.5
-						for (File f1 : f.listFiles()){
+					if (f.isDirectory()) { // v1.5
+						for (File f1 : f.listFiles()) {
 							if (f1.getName().endsWith(".jar")) {
 								copy.setFile(f1);
 								copy.execute();
 							}
 						}
-					}else {
+					} else {
 						copy.setFile(f);
 						copy.execute();
-					}	
+					}
 				}
 		}
 	}
@@ -300,12 +301,12 @@ public class BuildMain {
 		return path.delete();
 	}
 
-
-	public static  String join(String delima, List list) {
-		if (list==null||list.size()==0)return "";
-		StringBuffer sb= new StringBuffer();
+	public static String join(String delima, List list) {
+		if (list == null || list.size() == 0)
+			return "";
+		StringBuffer sb = new StringBuffer();
 		sb.append(list.get(0));
-		for (int i=1;i<list.size();i++){
+		for (int i = 1; i < list.size(); i++) {
 			sb.append(delima).append(list.get(i));
 		}
 		return sb.toString();
@@ -344,7 +345,7 @@ public class BuildMain {
 
 		public void addPrjs(List prjs) {
 			for (int i = 0; i < prjs.size(); i++) {
-				if (!(prjs.get(i) instanceof List)){
+				if (!(prjs.get(i) instanceof List)) {
 					continue;
 				}
 				List list = (List) prjs.get(i);
@@ -363,25 +364,27 @@ public class BuildMain {
 		}
 
 	}
+
 	static Map makeDefaultEmptyConfig() throws Exception {
 		File dir = new File(".");
-		log("Current Dir:"+ dir.getAbsolutePath());
+		log("Current Dir:" + dir.getAbsolutePath());
 		File srcDir = new File(dir, "src");
-		if (srcDir.exists() && srcDir.isDirectory()){
+		if (srcDir.exists() && srcDir.isDirectory()) {
 
-		}else{
+		} else {
 			log("'src' dir not found, exiting...");
 			return null;
 		}
 		String prjName = dir.getCanonicalFile().getName();
-		log("user default project name:"+prjName);
+		log("user default project name:" + prjName);
 		Map m = new HashMap();
 		m.put("baseDir", ".");
 		m.put("destDir", ".");
 		m.put("debug", "true");
-		m.put("prjs", (List)  PyData.parseAll(String.format("[ [ %s , . ],  ]" , prjName) ));
+		m.put("prjs", (List) PyData.parseAll(String.format("[ [ %s , . ],  ]", prjName)));
 		return m;
 	}
+
 	/**
 	 * @param args
 	 * @throws Exception
@@ -389,16 +392,19 @@ public class BuildMain {
 	public static void main(String[] args) throws Exception {
 		System.out.println("neoebuild v1.5.1 20150516");
 		Map param = null;
-		if (args.length==0){
-			param=makeDefaultEmptyConfig();
-			if (param==null) return;
-		} else{
+		if (args.length == 0) {
+			param = makeDefaultEmptyConfig();
+			if (param == null)
+				return;
+		} else {
 			param = new HashMap();
-			param.putAll( (Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8")) );
+			param.putAll((Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8")));
 		}
 		System.out.println(param);
 		String pb1 = (String) param.get("baseDir");
 		String destDir = (String) param.get("destDir");
+		if (destDir == null)
+			destDir = ".";
 		Object prjs = param.get("prjs");
 		Projects prjs1 = new Projects();
 		prjs1.addPrjs((List) prjs);
