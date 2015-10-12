@@ -32,17 +32,16 @@ Config file
 * A complicated sample
 ```
 {
-baseDir:"/neo/temp",
+baseDir:"/path/to/foo/bar",
 prjs:[
- [game1,game,{dep:[dbop], cp:["C:/run/h2-1.3.171.jar"]}],
- [gamebuilder1,game-builder,{dep:[mxz,game1,dbop], run:[["neoe.game.Build",main,["C:/tmp/gamerelease/lib","C:/tmp/gamerelease/build1","data1.bin"]] ]}],
- [gamecploader1,"/neo/pyj/appclassloader",{cp:["/neo/pyj/mxz/binary/xz.jar"]}],
- [dbop,"/neo/pyj/neoedbop",],
- [mxz, "/neo/pyj/mxz", {cp:["/neo/pyj/mxz/binary/xz.jar"]}],
+ [prjname1,path1,{dep:[other_prjnames], cp:["/path/xxx.jar"], main:"neoe.game1.Main", run:[[class,methodToInvokeWhenBuild,[params]]]}],
+ [prjname2,path2,{dep:[other_prjnames], cp:["/path/xxx.jar"], main:"neoe.game1.Main"}],
 ],
-destDir:"C:/tmp/gamerelease/lib",
+destDir:"/path/to/all-jars",
 encoding:"utf-8",
 debug:"true",
+source:7,
+taget:7,
 }                                                             
 ```
 * explain
