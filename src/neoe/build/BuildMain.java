@@ -125,8 +125,8 @@ public class BuildMain {
 			project.setName(prjName);
 			Javac javac = new Javac();
 			javac.setProject(project);
-			javac.setTarget(getParam("target", "1.6"));
-			javac.setSource(getParam("source", "1.6"));
+			javac.setTarget(getParam("target", "1.7"));
+			javac.setSource(getParam("source", "1.7"));
 			javac.setEncoding(getParam("encoding", "utf-8"));
 			javac.setDebug(new Boolean(getParam("debug", "false")));
 			File srcDir = new File(path.getAbsolutePath(), "/src");
@@ -390,7 +390,7 @@ public class BuildMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("neoebuild v1.5.1 20150516");
+		System.out.println("neoebuild v151104");
 		Map param = null;
 		if (args.length == 0) {
 			param = makeDefaultEmptyConfig();

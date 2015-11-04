@@ -11,6 +11,7 @@ apache maven, Makefile, ....
 *neoe* use Eclipse and Netbeans for his java projects developing, 
 but also on some *small* projects, it is clear and handy to use a plain text editor(like [*neoeedit*](https://github.com/neoedmund/neoeedit)) and a online javadoc,
 and build use neoebuild.
+Also big projects build using neoebuild is also cool.
 
 
 Features
@@ -39,7 +40,7 @@ prjs:[
 ],
 destDir:"/path/to/all-jars",
 encoding:"utf-8",
-debug:"true",
+debug:true,
 source:7,
 taget:7,
 }                                                             
@@ -50,7 +51,7 @@ as you can see, you can use
 
   - `dep:[]` for dependency on other projects.
   - `cp:[]` for jar in classpath
-  - `main:class-name` for main-class in jar
+  - `main:class-name` for main-class of jar
   - `run:[[class, method, [params]]]` for customized program to run while building
   - the build result jars will be copied into `destDir`
   - `prjs` format is `[name, dir, options]` 
@@ -59,4 +60,4 @@ as you can see, you can use
 
 Build neoebuild itself
 --------------------
-config file is `buildself.py`
+`neoebuild mybuild`
