@@ -24,6 +24,7 @@ import org.apache.tools.ant.taskdefs.Manifest.Attribute;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 
+import neoe.util.FindJDK;
 import neoe.util.PyData;
 
 public class BuildMain {
@@ -106,7 +107,7 @@ public class BuildMain {
 					if (succ == null)
 						succ = false;
 					if (!succ) {
-						log("build fail:"+t.getId());
+						log("build fail:" + t.getId());
 						throw new RuntimeException("build failed");
 					}
 				}
@@ -125,6 +126,8 @@ public class BuildMain {
 			project.setName(prjName);
 			Javac javac = new Javac();
 			javac.setProject(project);
+			javac.setExecutable(prjs.javaHome + "/bin/javac");
+			javac.setFork(true);
 			javac.setTarget(getParam("target", "1.7"));
 			javac.setSource(getParam("source", "1.7"));
 			javac.setEncoding(getParam("encoding", "utf-8"));
@@ -283,6 +286,8 @@ public class BuildMain {
 		}
 	}
 
+	public static final String VER = "v151126";
+
 	static public boolean deleteDirectory(File path, int lv) {
 		if (lv == 0)
 			System.out.println("delete " + path.getAbsolutePath());
@@ -338,6 +343,7 @@ public class BuildMain {
 		private Map<String, Prj> m;
 		public String baseDir = "";
 		boolean multithread = true;
+		public String javaHome;
 
 		public Projects() {
 			m = new HashMap<String, Prj>();
@@ -390,7 +396,8 @@ public class BuildMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("neoebuild v151104");
+		System.out.println("neoebuild "+VER);
+
 		Map param = null;
 		if (args.length == 0) {
 			param = makeDefaultEmptyConfig();
@@ -403,12 +410,23 @@ public class BuildMain {
 		System.out.println(param);
 		String pb1 = (String) param.get("baseDir");
 		String destDir = (String) param.get("destDir");
+		String javaHome = (String) param.get("javaHome");
 		if (destDir == null)
 			destDir = ".";
+		if (javaHome == null) {
+			String javaPath = new FindJDK().find(0, true);
+			if (!javaPath.isEmpty()) {
+				System.out.println("found latest JDK:" + javaPath);
+				javaHome = javaPath;
+			} else {
+				System.out.println("didnot found JDK");
+			}
+		}
 		Object prjs = param.get("prjs");
 		Projects prjs1 = new Projects();
 		prjs1.addPrjs((List) prjs);
-		prjs1.baseDir = pb1;
+		prjs1.baseDir = addPath(new File(args[0]).getParent(),  pb1).getAbsolutePath();
+		prjs1.javaHome = javaHome;
 		if (args.length > 1 && args[1].equals("clean"))
 			new BuildAll(param).clean(prjs1);
 		new BuildAll(param).build(prjs1, destDir);
