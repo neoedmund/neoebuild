@@ -6,25 +6,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Copy;
-import org.apache.tools.ant.taskdefs.Jar;
-import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.taskdefs.Javac;
-import org.apache.tools.ant.taskdefs.Manifest;
-import org.apache.tools.ant.taskdefs.Manifest.Attribute;
-import org.apache.tools.ant.types.FileSet;
-import org.apache.tools.ant.types.Path;
-
+import neoe.build.tools.Copy1;
+import neoe.build.tools.FileSet1;
+import neoe.build.tools.Jar1;
+import neoe.build.tools.Java1;
+import neoe.build.tools.Javac1;
+import neoe.build.tools.Path1;
+import neoe.build.tools.Project1;
+import neoe.build.tools.Projects;
 import neoe.util.FindJDK;
+import neoe.util.Log;
 import neoe.util.PyData;
 
 public class BuildMain {
@@ -34,7 +31,7 @@ public class BuildMain {
 		private Set<String> built, toBuild;
 		private Projects prjs;
 		private int turnNo;
-		private Project project;
+		private Project1 project;
 		private Map param;
 		String destDir;
 
@@ -50,7 +47,7 @@ public class BuildMain {
 			for (Prj p : prjs.m.values()) {
 				toBuild.add(p.name);
 			}
-			System.out.println("total " + toBuild);
+			log("total " + toBuild);
 			checkDeps();
 			while (toBuild.size() > 0) {
 				Set<String> turn = new HashSet<String>();
@@ -121,12 +118,12 @@ public class BuildMain {
 			log(prjName + ":build start");
 			File path = addPath(prjs.baseDir, prj.dir);
 
-			// System.out.println("Path="+path.getAbsolutePath());
-			project = new Project();
+			// log("Path="+path.getAbsolutePath());
+			project = new Project1(prjs);
 			project.setName(prjName);
-			Javac javac = new Javac();
+			Javac1 javac = new Javac1();
 			javac.setProject(project);
-			javac.setExecutable(prjs.javaHome + "/bin/javac");
+			javac.setExecutable(prjs.javaHome + (FindJDK.isWindows ? "/bin/javac.exe" : "/bin/javac"));
 			javac.setFork(true);
 			javac.setTarget(getParam("target", "1.7"));
 			javac.setSource(getParam("source", "1.7"));
@@ -136,11 +133,11 @@ public class BuildMain {
 			if (!srcDir.exists()) { // check /src
 				throw new RuntimeException("src dir not found:" + srcDir.getAbsolutePath());
 			}
-			javac.setSrcdir(new Path(project, path.getAbsolutePath() + "/src"));
+			javac.setSrcdir(path.getAbsolutePath() + "/src");
 			File buildDir = new File(path.getAbsolutePath() + "/build");
 			buildDir.mkdirs();
-			javac.setDestdir(buildDir);
-			Path cp = new Path(project);
+			javac.setDestdir(buildDir.getAbsolutePath());
+			Path1 cp = new Path1(project);
 			if (prj.cp != null) {
 				for (Object o : prj.cp) {
 					File f1 = addPath(prjs.baseDir, o.toString());
@@ -149,13 +146,13 @@ public class BuildMain {
 						File[] fs = f1.listFiles();
 						for (File f : fs) {
 							if (f.getName().endsWith(".jar")) {
-								// System.out.println("[D]add
+								// log("[D]add
 								// "+f.getAbsolutePath());
-								cp.add(new Path(project, f.getAbsolutePath()));
+								cp.add(f.getAbsolutePath());
 							}
 						}
 					} else {
-						cp.add(new Path(project, addPath(prjs.baseDir, o.toString()).getAbsolutePath()));
+						cp.add(addPath(prjs.baseDir, o.toString()).getAbsolutePath());
 					}
 				}
 			}
@@ -163,57 +160,56 @@ public class BuildMain {
 				for (Object o : prj.depends) {
 					Prj p1 = prjs.m.get(o.toString());
 					String po = addPath(prjs.baseDir, p1.dir).getAbsolutePath() + "/dist/" + p1.name + ".jar";
-					cp.add(new Path(project, po));
+					cp.add(po);
 
 				}
 			}
-			// System.out.println(cp);
+			// log(cp);
 			javac.setClasspath(cp);
 			// javac.setCompiler("javac1.7");
 			// javac.setFork(true);
-			javac.execute();
-			if (javac.getFileList().length == 0) {
+			int cnt = javac.execute();
+			if (cnt == 0) {
 				log(prjName + ":no more to compile");
 			} else {
-				log(prjName + ":compile files (" + javac.getFileList().length + ")");
+				log(prjName + ":compile files (" + cnt + ")");
 			}
 			// copy resources
 			log(prjName + ":copy resources");
-			Copy copy = new Copy();
+			Copy1 copy = new Copy1();
 			copy.setProject(project);
 			copy.setTodir(buildDir);
-			FileSet fs = new FileSet();
+			FileSet1 fs = new FileSet1();
 			fs.setDir(new File(path.getAbsolutePath() + "/src"));
-			fs.setExcludes("**/*.java");
+			fs.setExcludesEndsWith(".java");
+			fs.ignoreEclipsePrjFile=true;
 			copy.addFileset(fs);
 			copy.execute();
 
-			Jar jar = new Jar();
+			Jar1 jar = new Jar1();
 			jar.setProject(project);
 			File jarFile = new File(path.getAbsolutePath() + "/dist/" + prjName + ".jar");
 			jarFile.getParentFile().mkdirs();
 			jar.setDestFile(jarFile);
 			jar.setBasedir(buildDir);
 			if (prj.mainClass != null) {
-				Manifest newManifest = new Manifest();
-				newManifest.addConfiguredAttribute(new Attribute("Main-Class", prj.mainClass));
-				jar.addConfiguredManifest(newManifest);
+				jar.addConfiguredManifest("Main-Class", prj.mainClass);
 			}
 			jar.execute();
 			// log(prjName+":build finish");
 			copyTo(prj, destDir);
 
 			if (prj.run != null) {
-				Java run = new Java();
-				cp.add(new Path(project, jarFile.getAbsolutePath()));
-				run.setError(new File("error.log"));
+				Java1 run = new Java1();
+				cp.add(jarFile.getAbsolutePath());
+				run.setError(System.err);
 				run.setClasspath(cp);
 				run.setProject(project);
 				for (Object o : prj.run) {
 					List row = (List) o;
 					run.setClassname((String) row.get(0));
 					for (Object o1 : (List) row.get(2)) {
-						run.createArg().setValue(o1.toString());
+						run.addArg(o1.toString());
 					}
 					run.execute();
 				}
@@ -255,18 +251,19 @@ public class BuildMain {
 			}
 		}
 
-		public void copyTo(Prj prj, String dest) {
+		public void copyTo(Prj prj, String dest) throws IOException {
 			File destDir = addPath(prjs.baseDir, dest);
 			destDir.mkdirs();
 			// for (Prj prj : prjs.m.values()) {
 			String path = addPath(prjs.baseDir, prj.dir).getAbsolutePath();
-			Copy copy = new Copy();
+			Copy1 copy = new Copy1();
 			copy.setProject(project);
 			copy.setFile(new File(path + "/dist/" + prj.name + ".jar"));
 			copy.setTodir(destDir);
-			copy.execute();
+			int cnt = copy.execute();
 			// }
-			log(prj.name + ":jar copied to " + dest);
+			if (cnt > 0)
+				log(prj.name + ":jar copied to " + dest);
 			if (prj.cp != null)
 				for (Object o : prj.cp) {
 					// also copy cp jars
@@ -286,11 +283,11 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v151126";
+	public static final String VER = "v151201";
 
 	static public boolean deleteDirectory(File path, int lv) {
 		if (lv == 0)
-			System.out.println("delete " + path.getAbsolutePath());
+			log("delete " + path.getAbsolutePath());
 		if (path.exists()) {
 			File[] files = path.listFiles();
 			for (int i = 0; i < files.length; i++) {
@@ -302,7 +299,7 @@ public class BuildMain {
 			}
 		}
 		if (lv == 0)
-			System.out.println("delete " + path.getAbsolutePath() + " " + path.delete());
+			log("delete " + path.getAbsolutePath() + " " + path.delete());
 		return path.delete();
 	}
 
@@ -338,39 +335,6 @@ public class BuildMain {
 
 	}
 
-	public static class Projects {
-
-		private Map<String, Prj> m;
-		public String baseDir = "";
-		boolean multithread = true;
-		public String javaHome;
-
-		public Projects() {
-			m = new HashMap<String, Prj>();
-		}
-
-		public void addPrjs(List prjs) {
-			for (int i = 0; i < prjs.size(); i++) {
-				if (!(prjs.get(i) instanceof List)) {
-					continue;
-				}
-				List list = (List) prjs.get(i);
-				Prj prj = new Prj();
-				m.put((String) list.get(0), prj);
-				prj.name = (String) list.get(0);
-				prj.dir = (String) list.get(1);
-				if (list.size() >= 3) {
-					Map m = (Map) list.get(2);
-					prj.depends = (List) m.get("dep");
-					prj.cp = (List) m.get("cp");
-					prj.mainClass = (String) m.get("main");
-					prj.run = (List) m.get("run");
-				}
-			}
-		}
-
-	}
-
 	static Map makeDefaultEmptyConfig() throws Exception {
 		File dir = new File(".");
 		log("Current Dir:" + dir.getAbsolutePath());
@@ -396,7 +360,7 @@ public class BuildMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("neoebuild "+VER);
+		log("neoebuild " + VER);
 
 		Map param = null;
 		if (args.length == 0) {
@@ -407,7 +371,7 @@ public class BuildMain {
 			param = new HashMap();
 			param.putAll((Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8")));
 		}
-		System.out.println(param);
+		log(param.toString());
 		String pb1 = (String) param.get("baseDir");
 		String destDir = (String) param.get("destDir");
 		String javaHome = (String) param.get("javaHome");
@@ -416,16 +380,16 @@ public class BuildMain {
 		if (javaHome == null) {
 			String javaPath = new FindJDK().find(0, true);
 			if (!javaPath.isEmpty()) {
-				System.out.println("found latest JDK:" + javaPath);
+				log("found latest JDK:" + javaPath);
 				javaHome = javaPath;
 			} else {
-				System.out.println("didnot found JDK");
+				log("didnot found JDK");
 			}
 		}
 		Object prjs = param.get("prjs");
 		Projects prjs1 = new Projects();
 		prjs1.addPrjs((List) prjs);
-		prjs1.baseDir = addPath(new File(args[0]).getParent(),  pb1).getAbsolutePath();
+		prjs1.baseDir = addPath(new File(args[0]).getParent(), pb1).getAbsolutePath();
 		prjs1.javaHome = javaHome;
 		if (args.length > 1 && args[1].equals("clean"))
 			new BuildAll(param).clean(prjs1);
@@ -434,8 +398,7 @@ public class BuildMain {
 	}
 
 	public static void log(String s) {
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-		System.out.println("[" + sdf.format(new Date()) + "]" + s);
+		Log.log(s);
 	}
 
 	public static String readString(InputStream ins, String enc) throws IOException {

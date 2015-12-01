@@ -9,7 +9,7 @@ public class FindJDK {
 	private static final boolean DEBUG = false;
 	static String osname;
 	static String osarch;
-	static boolean isWindows;
+	public static boolean isWindows;
 	static boolean isX86;
 
 	// String[] pathWindow = new String[] { "Program Files/Java/" };
@@ -17,12 +17,15 @@ public class FindJDK {
 	// String[] pathLinux = new String[] { "/usr/lib/jvm/", };
 	private boolean jdk;
 
-	public FindJDK() {
+	static {
 		debug(osname = System.getProperty("os.name"));
 		debug(osarch = System.getProperty("os.arch"));
 		debug(System.getProperty("os.version"));
 		isWindows = osname.indexOf("Windows") >= 0;
 		isX86 = osarch.indexOf("x86") >= 0;
+	}
+
+	public FindJDK() {
 	}
 
 	public static void main(String[] args) {
@@ -130,9 +133,9 @@ public class FindJDK {
 		return ret;
 	}
 
-	private void debug(String s) {
+	private static void debug(String s) {
 		if (DEBUG)
-			System.out.println("[D]" + s);
+			Log.log("[D]" + s);
 
 	}
 
