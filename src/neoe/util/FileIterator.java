@@ -52,7 +52,7 @@ public class FileIterator implements Iterable<File> {
 				}
 			}
 
-			System.out.println(f.getAbsolutePath());
+			System.out.println(f.getCanonicalPath());
 
 		}
 		System.out.println(cnt);

@@ -34,10 +34,15 @@ public class Log {
 	private SimpleDateFormat time;
 	private Date now = new Date();
 
+	public static PrintWriter getWriter() {
+		Log a = Log.getLog(DEFAULT);
+		return a.out;
+	}
+
 	private Log(String name, String fn) {
 		try {
 			File f = new File(fn);
-			System.out.println("Log " + name + ":" + f.getAbsolutePath());
+			System.out.println("Log " + name + ":\n" + f.getCanonicalPath());
 			out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(f, true), "utf8"), true);
 			time = new SimpleDateFormat("yyMMdd H:m:s:S");
 		} catch (Exception ex) {

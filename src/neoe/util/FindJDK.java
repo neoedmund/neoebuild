@@ -1,6 +1,7 @@
 package neoe.util;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * For the intelligence of launch a java, Find the JDK smartly.
@@ -28,7 +29,7 @@ public class FindJDK {
 	public FindJDK() {
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		// test
 
@@ -47,8 +48,9 @@ public class FindJDK {
 	 * @param jdk
 	 *            true must be JDK, false JRE is okay
 	 * @return
+	 * @throws IOException 
 	 */
-	public String find(int bit, boolean jdk) {
+	public String find(int bit, boolean jdk) throws IOException {
 		String path = "";
 		this.jdk = jdk;
 		if (isWindows) {
@@ -78,7 +80,7 @@ public class FindJDK {
 		return path;
 	}
 
-	private String searchPath(String[] paths) {
+	private String searchPath(String[] paths) throws IOException {
 		String driver = "";
 		if (isWindows) {
 			driver = System.getenv("SystemDrive") + "/";
@@ -91,7 +93,7 @@ public class FindJDK {
 		return "";
 	}
 
-	private String searchAPath(String path) {
+	private String searchAPath(String path) throws IOException {
 		debug("search " + path);
 		File p = new File(path);
 		String latestVer = "";
@@ -104,7 +106,7 @@ public class FindJDK {
 							: (fn.indexOf("jdk") >= 0 || fn.indexOf("jre") >= 0 || fn.indexOf("java") >= 0);
 					if (!isJavaDir)
 						continue;
-					debug("check java dir:" + f.getAbsolutePath());
+					debug("check java dir:" + f.getCanonicalPath());
 					boolean found = false;
 					if (jdk) {
 						if (isWindows) {
@@ -123,7 +125,7 @@ public class FindJDK {
 						String ver = getVersion(f.getName());
 						if (ver.compareTo(latestVer) > 0) {
 							latestVer = ver;
-							ret = f.getAbsolutePath();
+							ret = f.getCanonicalPath();
 						}
 
 					}

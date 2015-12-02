@@ -21,9 +21,7 @@ public class Javac1 {
 
 	Path1 classpath;
 
-	public void setFork(boolean fork) {
-		// this.fork = fork;
-	}
+	 
 
 	public void setTarget(String target) {
 		this.target = target;
@@ -84,8 +82,9 @@ public class Javac1 {
 			//Log.log(prj.name+":nothing to compile.");
 			return cnt;
 		}
-		exec.addArg("@" + f.getAbsolutePath());
+		exec.addArg("@" + f.getCanonicalPath());
 		exec.execute();
+		f.delete();
 		return cnt;
 
 	}

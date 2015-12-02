@@ -11,6 +11,7 @@ public class Projects {
 	public String baseDir = "";
 	public boolean multithread = true;
 	public String javaHome;
+	public boolean verbose;
 
 	public Projects() {
 		m = new HashMap<String, Prj>();

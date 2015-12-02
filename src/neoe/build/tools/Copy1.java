@@ -45,8 +45,8 @@ public class Copy1 {
 		for (FileSet1 fs1 : fs) {
 			copyFileSet(fs1);
 		}
-		if (cnt > 0)
-			Log.log(String.format("[I]%s:Copied (%,d) files.", prj.name, cnt));
+		// if (cnt > 0) Log.log(String.format("[I]%s:Copied %,d files.",
+		// prj.name, cnt));
 		return cnt;
 	}
 
@@ -59,10 +59,10 @@ public class Copy1 {
 
 	private void copyRel(File base, File src) throws IOException {
 
-		String s1 = src.getParentFile().getAbsolutePath();
-		String s2 = base.getAbsolutePath();
+		String s1 = src.getParentFile().getCanonicalPath();
+		String s2 = base.getCanonicalPath();
 		if (!s1.startsWith(s2)) {
-			U.err(prj.name + ":cannot copyRel, please check file:" + src.getAbsolutePath());
+			U.err(prj.name + ":cannot copyRel, please check file:" + src.getCanonicalPath());
 			return;
 		}
 		String rel = s1.substring(s2.length()).replace('\\', '/');
@@ -76,7 +76,7 @@ public class Copy1 {
 
 	private void copyFile(File src) throws IOException {
 		if (!src.exists()) {
-			U.err(prj.name + ":warning:file not exists for copy:" + src.getAbsolutePath());
+			U.err(prj.name + ":warning:file not exists for copy:" + src.getCanonicalPath());
 			return;
 		}
 		if (src.isFile()) {
@@ -87,7 +87,7 @@ public class Copy1 {
 			fs1.setDir(src);
 			copyFileSet(fs1);
 		} else {
-			U.err(prj.name + ":warning:file not copied, please check:" + src.getAbsolutePath());
+			U.err(prj.name + ":warning:file not copied, please check:" + src.getCanonicalPath());
 			return;
 		}
 
@@ -102,7 +102,8 @@ public class Copy1 {
 
 	private void doCopy(File src, File target) throws IOException {
 		target.getParentFile().mkdirs();
-		System.out.println("copy " + src.getAbsolutePath() + " -> " + target.getAbsolutePath());
+		if (prj.prjs.verbose) Log.log("[I]" + prj.name + ":copy " + src.getCanonicalPath() + " -> "
+		 + target.getCanonicalPath());
 		Files.copy(src.toPath(), target.toPath(), StandardCopyOption.COPY_ATTRIBUTES,
 				StandardCopyOption.REPLACE_EXISTING);
 		cnt++;

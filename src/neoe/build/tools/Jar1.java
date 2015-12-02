@@ -43,20 +43,23 @@ public class Jar1 {
 		// jar cvfm classes.jar mymanifest -C foo/ .
 		if (manifest.isEmpty()) {
 			exec.addArg("cf");
-			exec.addArg(dest.getAbsolutePath());
-			exec.addArg("-C", base.getAbsolutePath());
+			exec.addArg(dest.getCanonicalPath());
+			exec.addArg("-C", base.getCanonicalPath());
 			exec.addArg(".");
+			exec.execute();
 		} else {
-			exec.addArg("cf");
-			exec.addArg(dest.getAbsolutePath());
+			exec.addArg("cfm");
+			exec.addArg(dest.getCanonicalPath());
 			File mf = U.getTempFile("manifest");
 			U.writeManifest(mf, manifest);
-			exec.addArg(mf.getAbsolutePath());
-			exec.addArg("-C", base.getAbsolutePath());
+			exec.addArg(mf.getCanonicalPath());
+			exec.addArg("-C", base.getCanonicalPath());
 			exec.addArg(".");
+			exec.execute();
+			mf.delete();
 		}
-		exec.execute();
-
+	
+	
 	}
 
 }

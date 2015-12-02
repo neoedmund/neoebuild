@@ -6,10 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
+import neoe.build.BuildMain;
 import neoe.util.FileIterator;
 import neoe.util.Log;
 
@@ -36,24 +38,24 @@ public class U {
 
 	public static int writeFileList(File outf, File srcdir, File destdir) throws Exception {
 		int cnt = 0;
-		String base = srcdir.getAbsolutePath().replace('\\', '/');
+		String base = srcdir.getCanonicalPath().replace('\\', '/');
 		if (!base.endsWith("/")) {
 			base = base + "/";
 		}
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outf), "UTF-8"));
-		for (File f : new FileIterator(srcdir.getAbsolutePath())) {
+		for (File f : new FileIterator(srcdir.getCanonicalPath())) {
 			String fn = f.getName();
 			if (f.isFile() && fn.endsWith(".java")) {
-				String fn1 = f.getAbsolutePath().replace('\\', '/');
+				String fn1 = f.getCanonicalPath().replace('\\', '/');
 				if (!fn1.startsWith(base)) {
 					Log.log("[W]Cannot list java file, please check:" + fn1);
 					continue;
 				}
 				String fn2 = fn1.substring(base.length());
 				File cls = new File(destdir, fn2.substring(0, fn2.length() - 5) + ".class");
-				//System.out.println("check "+cls.getAbsolutePath());
+				// System.out.println("check "+cls.getCanonicalPath());
 				if (!isNewer(f, cls)) {
-					//Log.log("[D]skip compiled " + fn1);
+					// Log.log("[D]skip compiled " + fn1);
 					continue;
 				}
 				cnt++;
@@ -66,9 +68,14 @@ public class U {
 
 	}
 
-	public static void writeManifest(File mf, Map<String, String> manifest) {
-		// TODO Auto-generated method stub
-
+	public static void writeManifest(File mf, Map<String, String> manifest) throws IOException {
+		PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(mf), "utf8"));
+		out.println("Manifest-Version: 1.0");
+		out.println("Build-By: neoebuild " + BuildMain.VER);
+		for (String k : manifest.keySet()) {
+			out.println(String.format("%s: %s", k, manifest.get(k)));
+		}
+		out.close();
 	}
 
 }

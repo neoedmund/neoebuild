@@ -45,6 +45,7 @@ public class BuildBox {
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Build fail:" + ex);
 				}
 			}
 		});
@@ -64,17 +65,13 @@ public class BuildBox {
 
 	}
 
-	protected void tryBuild(File f) {
-		try {
-			if (jcb.isSelected()) {
-				BuildMain.main(new String[] { f.getAbsolutePath(), "clean" });
-			} else {
-				BuildMain.main(new String[] { f.getAbsolutePath() });
-			}
-			JOptionPane.showMessageDialog(null, "Build end, see console for details");
-		} catch (Exception e) {
-			e.printStackTrace();
+	protected void tryBuild(File f) throws Exception {
+		if (jcb.isSelected()) {
+			BuildMain.main(new String[] { f.getCanonicalPath(), "clean" });
+		} else {
+			BuildMain.main(new String[] { f.getCanonicalPath() });
 		}
+		JOptionPane.showMessageDialog(null, "Build end, see console for details");
 	}
 
 }

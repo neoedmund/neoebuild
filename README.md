@@ -5,18 +5,14 @@ Neoe build tool for Java projects
 
 Short story
 ------------------
-**neoebuild** is a build tool used by neoe. It can be compared to tools like apache ant(actually neoebuild based on it),
-apache maven, Makefile, ....
+**neoebuild** is a build tool used by neoe for java source compile. 
+It can be compared with tools like apache ant, maven, Makefile, ...
 
-*neoe* use Eclipse and Netbeans for his java projects developing, 
-but also on some *small* projects, it is clear and handy to use a plain text editor(like [*neoeedit*](https://github.com/neoedmund/neoeedit)) and a online javadoc,
-and build use neoebuild.
-Also big projects build using neoebuild is also cool.
 
 
 Features
 -----------------
-* build multiple projects(one project is also OK).
+* build multiple projects.
 * projects have dependency on each others.
 * generate jars
 * a json like config file
