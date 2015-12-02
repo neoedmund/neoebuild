@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -336,7 +337,7 @@ public class BuildMain {
 	}
 
 	static Map makeDefaultEmptyConfig(String[] args) throws Exception {
-		File dir = args.length > 0 ? new File(args[0]).getParentFile() : new File(".");
+		File dir = args.length > 0 ? new File(args[0]).getAbsoluteFile().getParentFile() : new File(".");
 		log("Current Dir:" + dir.getCanonicalPath());
 		File srcDir = new File(dir, "src");
 		if (srcDir.exists() && srcDir.isDirectory()) {
@@ -361,6 +362,7 @@ public class BuildMain {
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("neoebuild " + VER);
+		System.out.println("args:"+Arrays.toString(args));
 		Map param = makeDefaultEmptyConfig(args);
 		if (args.length == 0) {
 			if (param == null)

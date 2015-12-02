@@ -21,8 +21,6 @@ public class Javac1 {
 
 	Path1 classpath;
 
-	 
-
 	public void setTarget(String target) {
 		this.target = target;
 	}
@@ -72,14 +70,17 @@ public class Javac1 {
 		if (target != null) {
 			exec.addArg("-target", target);
 		}
+
 		if (classpath != null) {
-			exec.addArg("-cp", classpath.toCommandlineString());
+			String cp = classpath.toCommandlineString();
+			if (!cp.isEmpty())
+				exec.addArg("-cp", cp);
 		}
 
 		File f = U.getTempFile("filelist");
 		int cnt = U.writeFileList(f, new File(srcdir), new File(destdir));
-		if (cnt==0){
-			//Log.log(prj.name+":nothing to compile.");
+		if (cnt == 0) {
+			// Log.log(prj.name+":nothing to compile.");
 			return cnt;
 		}
 		exec.addArg("@" + f.getCanonicalPath());

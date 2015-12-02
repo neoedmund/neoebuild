@@ -1,7 +1,12 @@
 package neoe.build.tools;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -102,11 +107,29 @@ public class Copy1 {
 
 	private void doCopy(File src, File target) throws IOException {
 		target.getParentFile().mkdirs();
-		if (prj.prjs.verbose) Log.log("[I]" + prj.name + ":copy " + src.getCanonicalPath() + " -> "
-		 + target.getCanonicalPath());
-		Files.copy(src.toPath(), target.toPath(), StandardCopyOption.COPY_ATTRIBUTES,
-				StandardCopyOption.REPLACE_EXISTING);
+		if (prj.prjs.verbose)
+			Log.log("[I]" + prj.name + ":copy " + src.getCanonicalPath() + " -> " + target.getCanonicalPath());
+		FileOutputStream out = new FileOutputStream(target);
+		FileInputStream in = new FileInputStream(src);
+		copy(in, out);
+		in.close();
+		out.close();
+		target.setLastModified(src.lastModified());
+		// Files.copy(src.toPath(), target.toPath(),
+		// StandardCopyOption.COPY_ATTRIBUTES,
+		// StandardCopyOption.REPLACE_EXISTING);
 		cnt++;
+	}
+
+	public static void copy(InputStream in, OutputStream outstream) throws IOException {
+		BufferedOutputStream out = new BufferedOutputStream(outstream);
+		byte[] buf = new byte[1024 * 10];
+		int len;
+		while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		in.close();
+		out.close();
 	}
 
 	public void setFile(File file) {

@@ -17,7 +17,7 @@ public class Log {
 
 	final static Map<String, Log> cache = new HashMap<String, Log>();
 
-	public static boolean stdout = false;
+	public static boolean stdout = true;
 
 	public static boolean debug = true;
 
