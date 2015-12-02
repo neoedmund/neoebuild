@@ -362,7 +362,7 @@ public class BuildMain {
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("neoebuild " + VER);
-		System.out.println("args:"+Arrays.toString(args));
+		System.out.println("args:" + Arrays.toString(args));
 		Map param = makeDefaultEmptyConfig(args);
 		if (args.length == 0) {
 			if (param == null)
@@ -391,10 +391,13 @@ public class BuildMain {
 		prjs1.addPrjs((List) prjs);
 		prjs1.baseDir = args.length == 0 ? "." : addPath(new File(args[0]).getParent(), pb1).getCanonicalPath();
 		prjs1.javaHome = javaHome;
+
+		long t1 = System.currentTimeMillis();
 		if (args.length > 1 && args[1].equals("clean"))
 			new BuildAll(param).clean(prjs1);
 		new BuildAll(param).build(prjs1, destDir);
-		log("program end.");
+		long t2 = System.currentTimeMillis();
+		log(String.format("program end. in %,d ms", t2 - t1));
 	}
 
 	public static void log(String s) {
