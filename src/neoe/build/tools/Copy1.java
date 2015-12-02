@@ -110,7 +110,8 @@ public class Copy1 {
 			Log.log("[I]" + prj.name + ":copy " + src.getCanonicalPath() + " -> " + target.getCanonicalPath());
 		FileOutputStream out = new FileOutputStream(target);
 		FileInputStream in = new FileInputStream(src);
-		copy(in, out);
+		long size = copy(in, out);
+		prj.prjs.totalCopyBS+=size;
 		in.close();
 		out.close();
 		target.setLastModified(src.lastModified());
@@ -121,15 +122,18 @@ public class Copy1 {
 
 	}
 
-	public static void copy(InputStream in, OutputStream outstream) throws IOException {
+	public static long copy(InputStream in, OutputStream outstream) throws IOException {
 		BufferedOutputStream out = new BufferedOutputStream(outstream);
 		byte[] buf = new byte[1024 * 10];
+		long total = 0;
 		int len;
 		while ((len = in.read(buf)) > 0) {
 			out.write(buf, 0, len);
+			total+=len;
 		}
 		in.close();
 		out.close();
+		return total;
 	}
 
 	public void setFile(File file) {
