@@ -86,8 +86,8 @@ public class Javac1 {
 		exec.addArg("@" + f.getCanonicalPath());
 		exec.execute();
 		f.delete();
+		prj.prjs.totalJavac+=cnt;
 		return cnt;
-
 	}
 
 	public void setProject(Project1 prj) {

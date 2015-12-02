@@ -397,7 +397,8 @@ public class BuildMain {
 			new BuildAll(param).clean(prjs1);
 		new BuildAll(param).build(prjs1, destDir);
 		long t2 = System.currentTimeMillis();
-		log(String.format("program end. in %,d ms", t2 - t1));
+		log(String.format("program end. in %,d ms, javac(compiled):%,d, copy:%,d, jar:%,d, java(exec):%,d.", t2 - t1,
+				prjs1.totalJavac, prjs1.totalCopy, prjs1.totalJar, prjs1.totalJava));
 	}
 
 	public static void log(String s) {

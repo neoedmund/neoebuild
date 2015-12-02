@@ -12,6 +12,10 @@ public class Projects {
 	public boolean multithread = true;
 	public String javaHome;
 	public boolean verbose;
+	public int totalJavac;
+	public int totalCopy;
+	public int totalJava;
+	public int totalJar;
 
 	public Projects() {
 		m = new HashMap<String, Prj>();

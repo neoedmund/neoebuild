@@ -44,6 +44,7 @@ public class Java1 {
 			e.addArg(s);
 		}
 		e.execute();
+		prj.prjs.totalJava++;
 	}
 
 	public void addArg(String s) {

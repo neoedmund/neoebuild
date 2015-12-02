@@ -7,8 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +50,7 @@ public class Copy1 {
 		}
 		// if (cnt > 0) Log.log(String.format("[I]%s:Copied %,d files.",
 		// prj.name, cnt));
+		prj.prjs.totalCopy += cnt;
 		return cnt;
 	}
 
@@ -119,6 +118,7 @@ public class Copy1 {
 		// StandardCopyOption.COPY_ATTRIBUTES,
 		// StandardCopyOption.REPLACE_EXISTING);
 		cnt++;
+
 	}
 
 	public static void copy(InputStream in, OutputStream outstream) throws IOException {

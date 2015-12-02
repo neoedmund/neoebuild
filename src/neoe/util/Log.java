@@ -36,7 +36,16 @@ public class Log {
 
 	public static PrintWriter getWriter() {
 		Log a = Log.getLog(DEFAULT);
-		return a.out;
+		return new PrintWriter(a.out) {
+			public void write(String str) {
+				write(str, 0, str.length());
+				if (stdout)
+					System.out.print(str);
+			}
+		    public void println() {
+		    	write("\n");
+		    }
+		};
 	}
 
 	private Log(String name, String fn) {

@@ -58,8 +58,7 @@ public class Jar1 {
 			exec.execute();
 			mf.delete();
 		}
-	
-	
+		prj.prjs.totalJar++;
 	}
 
 }
