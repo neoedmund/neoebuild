@@ -41,12 +41,13 @@ public class Jar1 {
 		Exec exec = new Exec(prj);
 		exec.setCmd(prj.prjs.javaHome + (FindJDK.isWindows ? "/bin/jar.exe" : "/bin/jar"));
 		// jar cvfm classes.jar mymanifest -C foo/ .
+		int code;
 		if (manifest.isEmpty()) {
 			exec.addArg("cf");
 			exec.addArg(dest.getCanonicalPath());
 			exec.addArg("-C", base.getCanonicalPath());
 			exec.addArg(".");
-			exec.execute();
+			code=exec.execute();
 		} else {
 			exec.addArg("cfm");
 			exec.addArg(dest.getCanonicalPath());
@@ -55,10 +56,14 @@ public class Jar1 {
 			exec.addArg(mf.getCanonicalPath());
 			exec.addArg("-C", base.getCanonicalPath());
 			exec.addArg(".");
-			exec.execute();
+			code=exec.execute();
 			mf.delete();
 		}
+		if (code<0){
+			throw new RuntimeException("Jar failed with code:"+code);
+		}
 		prj.prjs.totalJar++;
+		
 	}
 
 }

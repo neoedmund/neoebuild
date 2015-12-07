@@ -34,16 +34,19 @@ public class Java1 {
 	public void execute() throws Exception {
 		Exec e = new Exec(prj);
 		e.setCmd(prj.prjs.javaHome + (FindJDK.isWindows ? "/bin/java.exe" : "/bin/java"));
-		if (cp!=null){
+		if (cp != null) {
 			e.addArg("-cp", cp.toCommandlineString());
 		}
-		if (clsName!=null){
+		if (clsName != null) {
 			e.addArg(clsName);
 		}
-		for (String s: args){
+		for (String s : args) {
 			e.addArg(s);
 		}
-		e.execute();
+		int code = e.execute();
+		if (code < 0) {
+			throw new RuntimeException("java failed with code:" + code);
+		}
 		prj.prjs.totalJava++;
 	}
 

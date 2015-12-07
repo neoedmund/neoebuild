@@ -33,14 +33,14 @@ public class Exec {
 		sb.add(s2);
 	}
 
-	public void execute() throws Exception {
+	public int execute() throws Exception {
 		if (prj.prjs.verbose) Log.log("[I]" + prj.name + ":Exec:" + sb);
 		Process p = new ProcessBuilder().command(sb).start();
 		StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "stderr");
 		StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream(), "stdout");
 		outputGobbler.start();
 		errorGobbler.start();
-		p.waitFor();
+		return p.waitFor();
 	}
 
 	private class StreamGobbler extends Thread {

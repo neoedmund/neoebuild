@@ -170,6 +170,9 @@ public class BuildMain {
 			// javac.setCompiler("javac1.7");
 			// javac.setFork(true);
 			int cnt = javac.execute();
+			if (cnt < 0) {
+				throw new RuntimeException("javac failed with code:" + cnt);
+			}
 			if (cnt == 0) {
 				log(prjName + ":no more to compile");
 			} else {
@@ -284,7 +287,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v151202";
+	public static final String VER = "v151207";
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)

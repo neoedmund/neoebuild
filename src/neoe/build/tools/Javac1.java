@@ -84,9 +84,12 @@ public class Javac1 {
 			return cnt;
 		}
 		exec.addArg("@" + f.getCanonicalPath());
-		exec.execute();
+		int code = exec.execute();
 		f.delete();
-		prj.prjs.totalJavac+=cnt;
+		prj.prjs.totalJavac += cnt;
+		if (code != 0) {
+			return -Math.abs(code);
+		}
 		return cnt;
 	}
 
