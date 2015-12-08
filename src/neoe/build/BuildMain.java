@@ -287,7 +287,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v151207";
+	public static final String VER = "v151208";
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)
@@ -342,12 +342,14 @@ public class BuildMain {
 	static Map makeDefaultEmptyConfig(String[] args) throws Exception {
 		File dir = args.length > 0 ? new File(args[0]).getAbsoluteFile().getParentFile() : new File(".");
 		log("Current Dir:" + dir.getCanonicalPath());
-		File srcDir = new File(dir, "src");
-		if (srcDir.exists() && srcDir.isDirectory()) {
+		if (args.length == 0) {
+			File srcDir = new File(dir, "src");
+			if (srcDir.exists() && srcDir.isDirectory()) {
 
-		} else {
-			log("'src' dir not found, exiting...");
-			return null;
+			} else {
+				log("'src' dir not found, exiting...");
+				return null;
+			}
 		}
 		String prjName = dir.getCanonicalFile().getName();
 		log("user default project name:" + prjName);
@@ -367,9 +369,9 @@ public class BuildMain {
 		System.out.println("neoebuild " + VER);
 		System.out.println("args:" + Arrays.toString(args));
 		Map param = makeDefaultEmptyConfig(args);
+		if (param == null)
+			return;
 		if (args.length == 0) {
-			if (param == null)
-				return;
 		} else {
 			param.putAll((Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8")));
 		}
