@@ -22,7 +22,7 @@ Usage
 -----------------
 * `build <config-file>`  -  build
 * `build <config-file> clean`  -  a clean build
-
+* run `buildBox` and drop `build script file` into it 
 
 Config file
 ----------------
