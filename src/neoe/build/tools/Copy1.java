@@ -14,6 +14,7 @@ import neoe.util.Log;
 
 public class Copy1 {
 
+	private static final long CHECK_SIZE = 20000000;
 	private Project1 prj;
 	private File todir;
 
@@ -39,8 +40,13 @@ public class Copy1 {
 	}
 
 	int cnt;
+	public boolean continueWhenError;
+	private long t1, totalCopyBS, lastSizeDiv, lastBs, t0;
+	private boolean debugSpeed;
 
 	public int execute() throws IOException {
+		t0 = t1 = System.currentTimeMillis();
+		totalCopyBS = 0;
 		cnt = 0;
 		if (file != null) {
 			copyFile(file);
@@ -98,27 +104,61 @@ public class Copy1 {
 	}
 
 	private void copyOneFile(File src, File target) throws IOException {
+		try {
+			if (U.isNewer(src, target)) {
+				doCopy(src, target);
+				if (debugSpeed)
+					doDebugSpeed();
+			}
+		} catch (IOException ex) {
+			if (continueWhenError) {
+				System.err.println(ex);
+			} else {
+				throw ex;
+			}
+		}
+	}
 
-		if (U.isNewer(src, target)) {
-			doCopy(src, target);
+	private void doDebugSpeed() {
+		long sizeDiv = totalCopyBS / CHECK_SIZE;
+		if (sizeDiv > lastSizeDiv) {
+			long t2 = System.currentTimeMillis();
+			long t = t2 - t1;
+			if (t > 0) {
+				long bs = totalCopyBS - lastBs;
+				lastBs = totalCopyBS;
+				t1 = t2;
+				lastSizeDiv = sizeDiv;
+				Log.log(String.format("[D]speed %,dKB/s, cnt=%,d", bs / t, cnt));
+			}
 		}
 	}
 
 	private void doCopy(File src, File target) throws IOException {
 		target.getParentFile().mkdirs();
-		if (prj.prjs.verbose)
+		if (prj.prjs != null && prj.prjs.verbose)
 			Log.log("[I]" + prj.name + ":copy " + src.getCanonicalPath() + " -> " + target.getCanonicalPath());
-		FileOutputStream out = new FileOutputStream(target);
-		FileInputStream in = new FileInputStream(src);
-		long size = copy(in, out);
-		prj.prjs.totalCopyBS+=size;
-		in.close();
-		out.close();
-		target.setLastModified(src.lastModified());
-		// Files.copy(src.toPath(), target.toPath(),
-		// StandardCopyOption.COPY_ATTRIBUTES,
-		// StandardCopyOption.REPLACE_EXISTING);
-		cnt++;
+		FileInputStream in = null;
+		FileOutputStream out = null;
+		try {
+			in = new FileInputStream(src);
+			out = new FileOutputStream(target);
+			long size = copy(in, out);
+			prj.prjs.totalCopyBS += size;
+			totalCopyBS += size;
+			in.close();
+			out.close();
+			target.setLastModified(src.lastModified());
+			// Files.copy(src.toPath(), target.toPath(),
+			// StandardCopyOption.COPY_ATTRIBUTES,
+			// StandardCopyOption.REPLACE_EXISTING);
+			cnt++;
+		} finally {
+			if (in != null)
+				in.close();
+			if (out != null)
+				out.close();
+		}
 
 	}
 
@@ -129,7 +169,7 @@ public class Copy1 {
 		int len;
 		while ((len = in.read(buf)) > 0) {
 			out.write(buf, 0, len);
-			total+=len;
+			total += len;
 		}
 		in.close();
 		out.close();
@@ -140,6 +180,29 @@ public class Copy1 {
 		fs.clear();
 		this.file = file;
 
+	}
+
+	public static void main(String[] args) throws IOException {
+
+		// test , copy a dir
+		String from = args[0];
+		String to = args[1];
+		Copy1 copy = new Copy1();
+		Projects prjs = new Projects();
+		Project1 prj = new Project1(prjs);
+		prj.name = "testcopy";
+		copy.setProject(prj);
+		copy.setTodir(new File(to));
+		copy.continueWhenError = true;
+		copy.debugSpeed = true;
+		FileSet1 fs = new FileSet1();
+		fs.setDir(new File(from));
+		copy.addFileset(fs);
+		int cnt2 = copy.execute();
+		long t2 = System.currentTimeMillis();
+		long t = t2 - copy.t0;
+		Log.log(String.format("%s:copy %d resources, %,d bytes in %,dms (%,dKB/s)", prj.name, cnt2, copy.totalCopyBS, t,
+				t == 0 ? 0 : copy.totalCopyBS / t));
 	}
 
 }

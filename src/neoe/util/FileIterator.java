@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class FileIterator implements Iterable<File> {
 
-//	private String root;
+	// private String root;
 	List<File> buf;
 
 	public FileIterator(String dir) {
@@ -56,8 +56,7 @@ public class FileIterator implements Iterable<File> {
 
 		}
 		System.out.println(cnt);
-		System.out.println(linecnt[0] + "," + linecnt[1] + ","
-				+ (linecnt[1] * 100 / linecnt[0]) + "%");
+		System.out.println(linecnt[0] + "," + linecnt[1] + "," + (linecnt[1] * 100 / linecnt[0]) + "%");
 	}
 
 	private static int getLineCnt(File f, int[] linecnt) throws Exception {
@@ -87,7 +86,8 @@ public class FileIterator implements Iterable<File> {
 				File f = buf.remove(0);
 				if (f.isDirectory()) {
 					File[] sub = f.listFiles();
-					buf.addAll(Arrays.asList(sub));
+					if (sub != null)
+						buf.addAll(Arrays.asList(sub));
 				}
 				return f;
 			}
