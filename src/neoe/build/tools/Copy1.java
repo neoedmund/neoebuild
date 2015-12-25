@@ -15,6 +15,7 @@ import neoe.util.Log;
 public class Copy1 {
 
 	private static final long CHECK_SIZE = 20000000;
+	private static final int CHECK_CNT_SIZE = 20000;
 	private Project1 prj;
 	private File todir;
 
@@ -39,9 +40,9 @@ public class Copy1 {
 
 	}
 
-	int cnt;
+	int cnt, lastCnt;
 	public boolean continueWhenError;
-	private long t1, totalCopyBS, lastSizeDiv, lastBs, t0;
+	private long t1, totalCopyBS, lastSizeDiv, lastBs, t0, lastCntDiv;
 	private boolean debugSpeed;
 
 	public int execute() throws IOException {
@@ -112,7 +113,7 @@ public class Copy1 {
 			}
 		} catch (IOException ex) {
 			if (continueWhenError) {
-				System.err.println(ex);
+				Log.log("[W]" + ex);
 			} else {
 				throw ex;
 			}
@@ -121,15 +122,19 @@ public class Copy1 {
 
 	private void doDebugSpeed() {
 		long sizeDiv = totalCopyBS / CHECK_SIZE;
-		if (sizeDiv > lastSizeDiv) {
+		int cntDiv = cnt / CHECK_CNT_SIZE;
+		if (sizeDiv > lastSizeDiv || cntDiv > lastCntDiv) {
 			long t2 = System.currentTimeMillis();
 			long t = t2 - t1;
 			if (t > 0) {
 				long bs = totalCopyBS - lastBs;
+				int cnt1 = cnt - lastCnt;
 				lastBs = totalCopyBS;
 				t1 = t2;
+				lastCnt = cnt;
 				lastSizeDiv = sizeDiv;
-				Log.log(String.format("[D]speed %,dKB/s, cnt=%,d", bs / t, cnt));
+				lastCntDiv = cntDiv;
+				Log.log(String.format("[D]speed %,dKB/s, %,dKiloFile/sec, cnt=%,d", bs / t, cnt1 / t, cnt));
 			}
 		}
 	}
@@ -187,6 +192,7 @@ public class Copy1 {
 		// test , copy a dir
 		String from = args[0];
 		String to = args[1];
+		Log.log(String.format("copying from %s to %s", from, to));
 		Copy1 copy = new Copy1();
 		Projects prjs = new Projects();
 		Project1 prj = new Project1(prjs);

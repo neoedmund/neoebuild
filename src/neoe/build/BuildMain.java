@@ -173,11 +173,7 @@ public class BuildMain {
 			if (cnt < 0) {
 				throw new RuntimeException("javac failed with code:" + cnt);
 			}
-			if (cnt == 0) {
-				log(prjName + ":no more to compile");
-			} else {
-				log(prjName + ":compile files (" + cnt + ")");
-			}
+			
 			// copy resources
 
 			Copy1 copy = new Copy1();
@@ -287,7 +283,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v151208";
+	public static final String VER = "v151225";
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)

@@ -80,8 +80,10 @@ public class Javac1 {
 		File f = U.getTempFile("filelist");
 		int cnt = U.writeFileList(f, new File(srcdir), new File(destdir));
 		if (cnt == 0) {
-			// Log.log(prj.name+":nothing to compile.");
+			Log.log(prj.name+":nothing to compile.");
 			return cnt;
+		} else {
+			Log.log(String.format("%s:javac files (%,d)", prj.name, cnt));
 		}
 		exec.addArg("@" + f.getCanonicalPath());
 		int code = exec.execute();
