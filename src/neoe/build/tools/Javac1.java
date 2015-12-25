@@ -81,6 +81,7 @@ public class Javac1 {
 		int cnt = U.writeFileList(f, new File(srcdir), new File(destdir));
 		if (cnt == 0) {
 			Log.log(prj.name+":nothing to compile.");
+			f.delete();
 			return cnt;
 		} else {
 			Log.log(String.format("%s:javac files (%,d)", prj.name, cnt));
