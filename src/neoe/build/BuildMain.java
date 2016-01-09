@@ -283,7 +283,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v151225";
+	public static final String VER = "v160109";
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)

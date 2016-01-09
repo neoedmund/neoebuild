@@ -21,9 +21,8 @@ public class FindJDK {
 	static {
 		debug(osname = System.getProperty("os.name"));
 		debug(osarch = System.getProperty("os.arch"));
-		debug(System.getProperty("os.version"));
 		isWindows = osname.indexOf("Windows") >= 0;
-		isX86 = osarch.indexOf("x86") >= 0;
+		isX86 = osarch.indexOf("x86") >= 0 && System.getenv("ProgramW6432") == null;
 	}
 
 	public FindJDK() {
@@ -48,7 +47,7 @@ public class FindJDK {
 	 * @param jdk
 	 *            true must be JDK, false JRE is okay
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public String find(int bit, boolean jdk) throws IOException {
 		String path = "";
