@@ -54,7 +54,7 @@ public class Javac1 {
 		}
 		if (destdir != null) {
 			new File(destdir).mkdirs();
-			exec.addArg("-d", destdir);
+			exec.addArg("-d", enclosePath(destdir));
 		}
 
 		if (encoding != null) {
@@ -65,7 +65,7 @@ public class Javac1 {
 			exec.addArg("-source", source);
 		}
 		if (srcdir != null) {
-			exec.addArg("-sourcepath", srcdir);
+			exec.addArg("-sourcepath", enclosePath(srcdir));
 		}
 		if (target != null) {
 			exec.addArg("-target", target);
@@ -74,19 +74,19 @@ public class Javac1 {
 		if (classpath != null) {
 			String cp = classpath.toCommandlineString();
 			if (!cp.isEmpty())
-				exec.addArg("-cp", cp);
+				exec.addArg("-cp", enclosePath(cp));
 		}
 
 		File f = U.getTempFile("filelist");
 		int cnt = U.writeFileList(f, new File(srcdir), new File(destdir));
 		if (cnt == 0) {
-			Log.log(prj.name+":nothing to compile.");
+			Log.log(prj.name + ":nothing to compile.");
 			f.delete();
 			return cnt;
 		} else {
 			Log.log(String.format("%s:javac files (%,d)", prj.name, cnt));
 		}
-		exec.addArg("@" + f.getCanonicalPath());
+		exec.addArg(enclosePath("@" + f.getCanonicalPath()));
 		int code = exec.execute();
 		f.delete();
 		prj.prjs.totalJavac += cnt;
@@ -94,6 +94,13 @@ public class Javac1 {
 			return -Math.abs(code);
 		}
 		return cnt;
+	}
+
+	public static String enclosePath(String s) {
+		int p1 = s.indexOf(' ');
+		if (p1 < 0)
+			return s;
+		return "\"" + s + "\"";
 	}
 
 	public void setProject(Project1 prj) {

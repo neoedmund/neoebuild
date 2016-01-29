@@ -1,7 +1,7 @@
 {
 baseDir:".",
 prjs:[
- [neoebuild,.]
+ [neoebuild,. , {main:"neoe.build.BuildMain"}]
 ],
 destDir:".",
 debug:true
