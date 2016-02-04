@@ -283,7 +283,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v160129";
+	public static final String VER = "v160204";
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)
@@ -351,7 +351,7 @@ public class BuildMain {
 		log("user default project name:" + prjName);
 		Map m = new HashMap();
 		m.put("baseDir", ".");
-		m.put("destDir", ".");
+		m.put("destDir", "dist");
 		m.put("debug", "true");
 		m.put("prjs", (List) PyData.parseAll(String.format("[ [ %s , . ],  ]", prjName)));
 		return m;
@@ -376,7 +376,7 @@ public class BuildMain {
 		String destDir = (String) param.get("destDir");
 		String javaHome = (String) param.get("javaHome");
 		if (destDir == null)
-			destDir = ".";
+			destDir = "dist";
 		if (javaHome == null) {
 			String javaPath = new FindJDK().find(0, true);
 			if (!javaPath.isEmpty()) {
