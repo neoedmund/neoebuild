@@ -3,9 +3,12 @@ package neoe.build;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +24,7 @@ import neoe.build.tools.Javac1;
 import neoe.build.tools.Path1;
 import neoe.build.tools.Project1;
 import neoe.build.tools.Projects;
+import neoe.util.FileUtil;
 import neoe.util.FindJDK;
 import neoe.util.Log;
 import neoe.util.PyData;
@@ -173,7 +177,7 @@ public class BuildMain {
 			if (cnt < 0) {
 				throw new RuntimeException("javac failed with code:" + cnt);
 			}
-			
+
 			// copy resources
 
 			Copy1 copy = new Copy1();
@@ -283,7 +287,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v160204";
+	public static final String VER = "v170109";
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)
@@ -364,12 +368,16 @@ public class BuildMain {
 	public static void main(String[] args) throws Exception {
 		System.out.println("neoebuild " + VER);
 		System.out.println("args:" + Arrays.toString(args));
+		if (args.length > 0 && "-init".equals(args[0])) {
+			installInitBuildScript();
+			return;
+		}
 		Map param = makeDefaultEmptyConfig(args);
 		if (param == null)
 			return;
 		if (args.length == 0) {
 		} else {
-			param.putAll((Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8")));
+			param.putAll((Map) PyData.parseAll(readString(new FileInputStream(args[0]), "utf8"), false));
 		}
 		System.out.println(param.toString());
 		String pb1 = (String) param.get("baseDir");
@@ -400,6 +408,18 @@ public class BuildMain {
 		long t2 = System.currentTimeMillis();
 		log(String.format("program end. in %,d ms, javac(compiled):%,d, copy:%,d(%,d bytes), jar:%,d, java(exec):%,d.",
 				t2 - t1, prjs1.totalJavac, prjs1.totalCopy, prjs1.totalCopyBS, prjs1.totalJar, prjs1.totalJava));
+	}
+
+	private static void installInitBuildScript() throws Exception {
+		File f = new File("mybuild");
+		if (f.exists()) {
+			System.out.println("mybuild seems already exists");
+			return;
+		}
+		InputStream in = BuildMain.class.getResourceAsStream("defaultScript");
+		OutputStream out = new FileOutputStream(f);
+		FileUtil.copy(in, out);
+		System.out.println("default script saved to 'mybuild'");
 	}
 
 	public static void log(String s) {
