@@ -31,9 +31,9 @@ public class Path1 {
 			if (sb.length() > 0) {
 				sb.append(sep);
 			}
-			sb.append('"');
+			if (FindJDK.isWindows) sb.append('"');
 			sb.append(p1);
-			sb.append('"');
+			if (FindJDK.isWindows) sb.append('"');
 		}
 		return sb.toString();
 	}
