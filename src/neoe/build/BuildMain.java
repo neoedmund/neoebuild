@@ -130,8 +130,8 @@ public class BuildMain {
 			javac.setProject(project);
 			javac.setExecutable(prjs.javaHome + (FindJDK.isWindows ? "/bin/javac.exe" : "/bin/javac"));
 			// javac.setFork(true);
-			javac.setTarget(getParam("target", "1.7"));
-			javac.setSource(getParam("source", "1.7"));
+			javac.setTarget(getParam("target", "8"));
+			javac.setSource(getParam("source", "8"));
 			javac.setEncoding(getParam("encoding", "utf-8"));
 			javac.setDebug(new Boolean(getParam("debug", "false")));
 			File srcDir = new File(path.getCanonicalPath(), "/src");
@@ -287,7 +287,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v7h21";
+	public static final String VER = "v9h8";
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)
