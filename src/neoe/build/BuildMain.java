@@ -3,7 +3,6 @@ package neoe.build;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,7 +77,7 @@ public class BuildMain {
 
 		private void buildTurn(Set<String> turn) throws Exception {
 			turnNo++;
-			log("Turn " + turnNo + " start " + turn.size() + " projects " + turn);
+			log("Turn [" + turnNo + "] start " + turn.size() + " projects " + turn);
 			if (!prjs.multithread) {
 				for (String n : turn) {
 					Prj prj = prjs.m.get(n);
@@ -88,6 +87,7 @@ public class BuildMain {
 				final Map<Long, Boolean> success = new HashMap<Long, Boolean>();
 				Thread[] ts = new Thread[turn.size()];
 				int i = 0;
+				Map<Long, Prj> namemap = new HashMap();
 				for (String n : turn) {
 					final Prj prj = prjs.m.get(n);
 					Thread t = new Thread() {
@@ -102,6 +102,7 @@ public class BuildMain {
 					};
 					t.start();
 					ts[i++] = t;
+					namemap.put(t.getId(), prj);
 				}
 				for (Thread t : ts) {
 					t.join();
@@ -109,18 +110,18 @@ public class BuildMain {
 					if (succ == null)
 						succ = false;
 					if (!succ) {
-						log("build fail:" + t.getId());
+						log("build fail:" + namemap.get(t.getId()).name);
 						throw new RuntimeException("build failed");
 					}
 				}
 			}
-			log("Turn " + turnNo + " finish");
+			log("Turn [" + turnNo + "] finish");
 		}
 
 		public void buildPrj(Prj prj) throws Exception {
 
 			String prjName = prj.name;
-			log(prjName + ":build start");
+			log(prjName + " start");
 			File path = addPath(prjs.baseDir, prj.dir);
 
 			// log("Path="+path.getCanonicalPath());
@@ -287,7 +288,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v9h8";
+	public static final String VER = "v9h15".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)
