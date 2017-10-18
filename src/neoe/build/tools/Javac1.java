@@ -1,6 +1,7 @@
 package neoe.build.tools;
 
 import java.io.File;
+import java.util.List;
 
 import neoe.util.Log;
 
@@ -20,6 +21,7 @@ public class Javac1 {
 	}
 
 	Path1 classpath;
+	private List opt;
 
 	public void setTarget(String target) {
 		this.target = target;
@@ -48,10 +50,15 @@ public class Javac1 {
 	public int execute() throws Exception {
 		Exec exec = new Exec(prj);
 		exec.setCmd(executable);
-
+		if (opt != null) {
+			for (Object o : opt) {
+				exec.addArg(o.toString());
+			}
+		}
 		if (!debug) {
 			exec.addArg("-g:none");
 		}
+
 		if (destdir != null) {
 			new File(destdir).mkdirs();
 			exec.addArg("-d", enclosePath(destdir));
@@ -109,6 +116,13 @@ public class Javac1 {
 
 	public void setSrcdir(String string) {
 		this.srcdir = string;
+	}
+
+	public void setOpt(List opt) {
+		if (opt != null) {
+			this.opt = opt;
+		}
+
 	}
 
 }

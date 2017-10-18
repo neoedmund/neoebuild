@@ -134,7 +134,8 @@ public class BuildMain {
 			javac.setTarget(getParam("target", "8"));
 			javac.setSource(getParam("source", "8"));
 			javac.setEncoding(getParam("encoding", "utf-8"));
-			javac.setDebug(new Boolean(getParam("debug", "false")));
+			javac.setDebug(Boolean.valueOf(getParam("debug", "false")));
+			javac.setOpt((List) param.get("javac_opt"));
 			File srcDir = new File(path.getCanonicalPath(), "/src");
 			if (!srcDir.exists()) { // check /src
 				throw new RuntimeException("src dir not found:" + srcDir.getCanonicalPath());
@@ -288,7 +289,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v9h15".toString();
+	public static final String VER = "v10h18".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)
