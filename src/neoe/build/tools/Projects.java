@@ -38,6 +38,7 @@ public class Projects {
 				prj.cp = (List) m.get("cp");
 				prj.mainClass = (String) m.get("main");
 				prj.run = (List) m.get("run");
+				prj.srcDir = (List) m.get("srcDir");
 			}
 		}
 	}

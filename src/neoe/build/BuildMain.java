@@ -127,71 +127,75 @@ public class BuildMain {
 			// log("Path="+path.getCanonicalPath());
 			project = new Project1(prjs);
 			project.setName(prjName);
-			Javac1 javac = new Javac1();
-			javac.setProject(project);
-			javac.setExecutable(prjs.javaHome + (FindJDK.isWindows ? "/bin/javac.exe" : "/bin/javac"));
-			// javac.setFork(true);
-			javac.setTarget(getParam("target", "8"));
-			javac.setSource(getParam("source", "8"));
-			javac.setEncoding(getParam("encoding", "utf-8"));
-			javac.setDebug(Boolean.valueOf(getParam("debug", "false")));
-			javac.setOpt((List) param.get("javac_opt"));
-			File srcDir = new File(path.getCanonicalPath(), "/src");
-			if (!srcDir.exists()) { // check /src
-				throw new RuntimeException("src dir not found:" + srcDir.getCanonicalPath());
-			}
-			javac.setSrcdir(path.getCanonicalPath() + "/src");
 			File buildDir = new File(path.getCanonicalPath() + "/build");
-			buildDir.mkdirs();
-			javac.setDestdir(buildDir.getCanonicalPath());
 			Path1 cp = new Path1(project);
-			if (prj.cp != null) {
-				for (Object o : prj.cp) {
-					File f1 = addPath(prjs.baseDir, o.toString());
-					if (f1.isDirectory()) {
-						// v1.5 : cp can be dir ,eg lib dir
-						File[] fs = f1.listFiles();
-						for (File f : fs) {
-							if (f.getName().endsWith(".jar")) {
-								// log("[D]add
-								// "+f.getCanonicalPath());
-								cp.add(f.getCanonicalPath());
+			buildDir.mkdirs();
+			for (Object srco : prj.getSrcDir()) {
+				String src = (String) srco;
+				Javac1 javac = new Javac1();
+				javac.setProject(project);
+				javac.setExecutable(prjs.javaHome + (FindJDK.isWindows ? "/bin/javac.exe" : "/bin/javac"));
+				// javac.setFork(true);
+				javac.setTarget(getParam("target", "8"));
+				javac.setSource(getParam("source", "8"));
+				javac.setEncoding(getParam("encoding", "utf-8"));
+				javac.setDebug(Boolean.valueOf(getParam("debug", "false")));
+				javac.setOpt((List) param.get("javac_opt"));
+				File srcDir = new File(path.getCanonicalPath(), src);
+				if (!srcDir.exists()) {
+					throw new RuntimeException("src dir not found:" + srcDir.getCanonicalPath());
+				}
+				javac.setSrcdir(srcDir.getCanonicalPath());
+
+				javac.setDestdir(buildDir.getCanonicalPath());
+
+				if (prj.cp != null) {
+					for (Object o : prj.cp) {
+						File f1 = addPath(prjs.baseDir, o.toString());
+						if (f1.isDirectory()) {
+							// v1.5 : cp can be dir ,eg lib dir
+							File[] fs = f1.listFiles();
+							for (File f : fs) {
+								if (f.getName().endsWith(".jar")) {
+									// log("[D]add
+									// "+f.getCanonicalPath());
+									cp.add(f.getCanonicalPath());
+								}
 							}
+						} else {
+							cp.add(addPath(prjs.baseDir, o.toString()).getCanonicalPath());
 						}
-					} else {
-						cp.add(addPath(prjs.baseDir, o.toString()).getCanonicalPath());
 					}
 				}
-			}
-			if (prj.depends != null) {
-				for (Object o : prj.depends) {
-					Prj p1 = prjs.m.get(o.toString());
-					String po = addPath(prjs.baseDir, p1.dir).getCanonicalPath() + "/dist/" + p1.name + ".jar";
-					cp.add(po);
+				if (prj.depends != null) {
+					for (Object d : prj.depends) {
+						Prj p1 = prjs.m.get(d.toString());
+						String po = addPath(prjs.baseDir, p1.dir).getCanonicalPath() + "/dist/" + p1.name + ".jar";
+						cp.add(po);
 
+					}
 				}
-			}
-			// log(cp);
-			javac.setClasspath(cp);
-			// javac.setCompiler("javac1.7");
-			// javac.setFork(true);
-			int cnt = javac.execute();
-			if (cnt < 0) {
-				throw new RuntimeException("javac failed with code:" + cnt);
-			}
+				// log(cp);
+				javac.setClasspath(cp);
+				// javac.setCompiler("javac1.7");
+				// javac.setFork(true);
+				int cnt = javac.execute();
+				if (cnt < 0) {
+					throw new RuntimeException("javac failed with code:" + cnt);
+				}
 
-			// copy resources
-
-			Copy1 copy = new Copy1();
-			copy.setProject(project);
-			copy.setTodir(buildDir);
-			FileSet1 fs = new FileSet1();
-			fs.setDir(new File(path.getCanonicalPath() + "/src"));
-			fs.setExcludesEndsWith(".java");
-			fs.ignoreEclipsePrjFile = true;
-			copy.addFileset(fs);
-			int cnt2 = copy.execute();
-			log(String.format("%s:copy %d resources", prjName, cnt2));
+				// copy resources
+				Copy1 copy = new Copy1();
+				copy.setProject(project);
+				copy.setTodir(buildDir);
+				FileSet1 fs = new FileSet1();
+				fs.setDir(new File(path.getCanonicalPath(), src));
+				fs.setExcludesEndsWith(".java");
+				fs.ignoreEclipsePrjFile = true;
+				copy.addFileset(fs);
+				int cnt2 = copy.execute();
+				log(String.format("%s:copy %d resources", prjName, cnt2));
+			}
 
 			Jar1 jar = new Jar1();
 			jar.setProject(project);
@@ -289,7 +293,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v10h18".toString();
+	public static final String VER = "v11h8".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (lv == 0)
@@ -338,7 +342,13 @@ public class BuildMain {
 		public List depends;
 		public List cp;
 		public List run;
+		public List srcDir;
 
+		public List getSrcDir() {
+			if (srcDir == null || srcDir.isEmpty())
+				return Arrays.asList(new String[] { "src" });
+			return srcDir;
+		}
 	}
 
 	static Map makeDefaultEmptyConfig(String[] args) throws Exception {
