@@ -1,7 +1,7 @@
 { /* neoebuild script */
 baseDir:"."
 prjs:[
- [this_project_name, "." , { dep:[ /* depending projects */]  cp:[ /*classpaths*/ ] /* main:"main-class-name" */}]
+ [this_project_name, "." , { /* srcDir:["src/java" "src/resources"] */ dep:[ /* depending projects */]  cp:[ /*classpaths*/ ] /* main:"main-class-name" */}]
  /* other projects */
 ]
 destDir:"dist"
