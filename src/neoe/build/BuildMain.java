@@ -23,6 +23,7 @@ import neoe.build.tools.Javac1;
 import neoe.build.tools.Path1;
 import neoe.build.tools.Project1;
 import neoe.build.tools.Projects;
+import neoe.build.tools.U;
 import neoe.util.FileUtil;
 import neoe.util.FindJDK;
 import neoe.util.Log;
@@ -121,7 +122,7 @@ public class BuildMain {
 		public void buildPrj(Prj prj) throws Exception {
 
 			String prjName = prj.name;
-			log(prjName + " start");
+			// log(prjName + " start");
 			File path = addPath(prjs.baseDir, prj.dir);
 
 			// log("Path="+path.getCanonicalPath());
@@ -185,6 +186,10 @@ public class BuildMain {
 				if (cnt < 0) {
 					throw new RuntimeException("javac failed with code:" + cnt);
 				}
+
+				String[] cntAndSkip = U.getCntAndSkip(cnt, project.skipJavac);
+				Log.log(String.format("%s:javac %s%s", prj.name, cntAndSkip[0], cntAndSkip[1]));
+
 			}
 			int cnt2 = 0;
 			for (Object srco : srcdirs.sub) {
@@ -200,7 +205,8 @@ public class BuildMain {
 				copy.addFileset(fs);
 				cnt2 += copy.execute();
 			}
-			log(String.format("%s:copy %d resources", prjName, cnt2));
+			String[] cntAndSkip = U.getCntAndSkip(cnt2, project.skipResource);
+			Log.log(String.format("%s:copy resource %s%s", prj.name, cntAndSkip[0], cntAndSkip[1]));
 
 			File jarFile = new File(path.getCanonicalPath() + "/dist/" + prjName + ".jar");
 			if (jarFile.exists() && cnt2 == 0 && cnt == 0) {
@@ -302,7 +308,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v11h13d".toString();
+	public static final String VER = "v11h13e".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (path.exists()) {
@@ -426,9 +432,9 @@ public class BuildMain {
 		new BuildAll(param).build(prjs1, destDir);
 		long t2 = System.currentTimeMillis();
 		log(String.format(
-				"program end. in %,d ms, javac(compiled):%,d, copy:%,d(%,d bytes), jar:%,d(%,d bytes), java-exec:%,d.",
-				t2 - t1, prjs1.totalJavac, prjs1.totalCopy, prjs1.totalCopyBS, prjs1.totalJar, prjs1.totalCopyBSJar,
-				prjs1.totalJava));
+				"program end. in %,d ms, javac:%,d(skip %,d), copy:%,d(skip %,d) %,d bytes, jar:%,d(%,d bytes), java-exec:%,d.",
+				t2 - t1, prjs1.totalJavac, prjs1.totalSkipJavac, prjs1.totalCopy, prjs1.totalSkipResource,
+				prjs1.totalCopyBS, prjs1.totalJar, prjs1.totalCopyBSJar, prjs1.totalJava));
 	}
 
 	private static void installInitBuildScript() throws Exception {

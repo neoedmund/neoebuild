@@ -14,6 +14,8 @@ public class Projects {
 	public boolean verbose;
 	public int totalJavac;
 	public int totalCopy;
+	public int totalSkipJavac;
+	public int totalSkipResource;
 	public int totalJava;
 	public int totalJar;
 	public long totalCopyBS;

@@ -56,9 +56,8 @@ public class Copy1 {
 		for (FileSet1 fs1 : fs) {
 			copyFileSet(fs1);
 		}
-		// if (cnt > 0) Log.log(String.format("[I]%s:Copied %,d files.",
-		// prj.name, cnt));
 		prj.prjs.totalCopy += cnt;
+		prj.prjs.totalSkipResource += prj.skipResource;
 		return cnt;
 	}
 
@@ -111,6 +110,8 @@ public class Copy1 {
 				doCopy(src, target);
 				if (debugSpeed)
 					doDebugSpeed();
+			} else {
+				prj.skipResource++;
 			}
 		} catch (IOException ex) {
 			if (continueWhenError) {
@@ -161,8 +162,8 @@ public class Copy1 {
 				prj.prjs.totalCopyBS += size;
 				totalCopyBS += size;
 				cnt++;
-			}else {
-				prj.prjs.totalCopyBSJar +=size;
+			} else {
+				prj.prjs.totalCopyBSJar += size;
 			}
 		} finally {
 			if (in != null)
@@ -191,29 +192,6 @@ public class Copy1 {
 		fs.clear();
 		this.file = file;
 
-	}
-
-	public static void main(String[] args) throws IOException {
-		// test , copy a dir
-		String from = args[0];
-		String to = args[1];
-		Log.log(String.format("copying from %s to %s", from, to));
-		Copy1 copy = new Copy1();
-		Projects prjs = new Projects();
-		Project1 prj = new Project1(prjs);
-		prj.name = "testcopy";
-		copy.setProject(prj);
-		copy.setTodir(new File(to));
-		copy.continueWhenError = true;
-		copy.debugSpeed = true;
-		FileSet1 fs = new FileSet1();
-		fs.setDir(new File(from));
-		copy.addFileset(fs);
-		int cnt2 = copy.execute();
-		long t2 = System.currentTimeMillis();
-		long t = t2 - copy.t0;
-		Log.log(String.format("%s:copy %d resources, %,d bytes in %,dms (%,dKB/s)", prj.name, cnt2, copy.totalCopyBS, t,
-				t == 0 ? 0 : copy.totalCopyBS / t));
 	}
 
 }

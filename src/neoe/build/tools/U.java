@@ -33,7 +33,7 @@ public class U {
 		// return new File(fn+".tmp");
 	}
 
-	public static int writeFileList(File outf, Path1 srcdirs, File destdir) throws Exception {
+	public static int writeFileList(File outf, Path1 srcdirs, File destdir, Project1 prj) throws Exception {
 		int cnt = 0;
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outf), "UTF-8"));
 
@@ -58,6 +58,7 @@ public class U {
 					// System.out.println("check " + cls.getCanonicalPath());
 					if (!isNewer(f, cls)) {
 						// Log.log("[D]skip compiled " + fn1);
+						prj.skipJavac++;
 						continue;
 					}
 					cnt++;
@@ -79,6 +80,14 @@ public class U {
 			out.println(String.format("%s: %s", k, manifest.get(k)));
 		}
 		out.close();
+	}
+
+	public static String[] getCntAndSkip(int cnt, int skip) {
+		String s1 = cnt > 0 ? String.format("%,d files", cnt) : "";
+		String s2 = skip > 0 ? "skip " + String.format("%,d files", skip) : "";
+		if (s1.length() > 0 && s2.length() > 0)
+			s2 = ", " + s2;
+		return new String[] { s1, s2 };
 	}
 
 }

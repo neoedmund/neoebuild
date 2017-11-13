@@ -89,20 +89,18 @@ public class Javac1 {
 		}
 
 		File f = U.getTempFile("filelist");
-		int cnt = U.writeFileList(f, srcdir, new File(destdir));
-		if (cnt == 0) {
-			Log.log(prj.name + ":javac 0 file");
+		int cnt = U.writeFileList(f, srcdir, new File(destdir), prj);
+		prj.prjs.totalJavac += cnt;
+		prj.prjs.totalSkipJavac += prj.skipJavac;
+		if (cnt <= 0) {
 			f.delete();
-			return cnt;
-		} else {
-			Log.log(String.format("%s:javac files (%,d)", prj.name, cnt));
+			return 0;
 		}
 		exec.addArg(enclosePath("@" + f.getCanonicalPath()));
 		int code = exec.execute();
 		f.delete();
-		prj.prjs.totalJavac += cnt;
 		if (code != 0) {
-			return -Math.abs(code);
+			throw new RuntimeException("javac error");
 		}
 		return cnt;
 	}
