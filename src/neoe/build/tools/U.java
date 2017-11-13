@@ -2,13 +2,10 @@ package neoe.build.tools;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.Map;
 
 import neoe.build.BuildMain;
@@ -36,31 +33,37 @@ public class U {
 		// return new File(fn+".tmp");
 	}
 
-	public static int writeFileList(File outf, File srcdir, File destdir) throws Exception {
+	public static int writeFileList(File outf, Path1 srcdirs, File destdir) throws Exception {
 		int cnt = 0;
-		String base = srcdir.getCanonicalPath().replace('\\', '/');
-		if (!base.endsWith("/")) {
-			base = base + "/";
-		}
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outf), "UTF-8"));
-		for (File f : new FileIterator(srcdir.getCanonicalPath())) {
-			String fn = f.getName();
-			if (f.isFile() && fn.endsWith(".java")) {
-				String fn1 = f.getCanonicalPath().replace('\\', '/');
-				if (!fn1.startsWith(base)) {
-					Log.log("[W]Cannot list java file, please check:" + fn1);
+
+		for (String srcdir : srcdirs.sub) {
+			String base = new File(srcdirs.basePath, srcdir).getCanonicalPath().replace('\\', '/');
+			if (!base.endsWith("/")) {
+				base = base + "/";
+			}
+			// System.out.println("base=" + base);
+			for (File f : new FileIterator(new File(base).getAbsolutePath())) {
+				String fn = f.getName();
+				if (fn.equals("package-info.java"))
 					continue;
+				if (f.isFile() && fn.endsWith(".java")) {
+					String fn1 = f.getCanonicalPath().replace('\\', '/');
+					if (!fn1.startsWith(base)) {
+						Log.log("[W]Cannot list java file, please check:" + fn1);
+						continue;
+					}
+					String fn2 = fn1.substring(base.length());
+					File cls = new File(destdir, fn2.substring(0, fn2.length() - 5) + ".class");
+					// System.out.println("check " + cls.getCanonicalPath());
+					if (!isNewer(f, cls)) {
+						// Log.log("[D]skip compiled " + fn1);
+						continue;
+					}
+					cnt++;
+					out.write(fn1);
+					out.write("\n");
 				}
-				String fn2 = fn1.substring(base.length());
-				File cls = new File(destdir, fn2.substring(0, fn2.length() - 5) + ".class");
-				// System.out.println("check "+cls.getCanonicalPath());
-				if (!isNewer(f, cls)) {
-					// Log.log("[D]skip compiled " + fn1);
-					continue;
-				}
-				cnt++;
-				out.write(fn1);
-				out.write("\n");
 			}
 		}
 		out.close();

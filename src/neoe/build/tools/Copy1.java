@@ -44,6 +44,7 @@ public class Copy1 {
 	public boolean continueWhenError;
 	private long t1, totalCopyBS, lastSizeDiv, lastBs, t0, lastCntDiv;
 	private boolean debugSpeed;
+	public boolean isCopyJar;
 
 	public int execute() throws IOException {
 		t0 = t1 = System.currentTimeMillis();
@@ -149,15 +150,20 @@ public class Copy1 {
 			in = new FileInputStream(src);
 			out = new FileOutputStream(target);
 			long size = copy(in, out);
-			prj.prjs.totalCopyBS += size;
-			totalCopyBS += size;
+
 			in.close();
 			out.close();
 			target.setLastModified(src.lastModified());
 			// Files.copy(src.toPath(), target.toPath(),
 			// StandardCopyOption.COPY_ATTRIBUTES,
 			// StandardCopyOption.REPLACE_EXISTING);
-			cnt++;
+			if (!isCopyJar) {
+				prj.prjs.totalCopyBS += size;
+				totalCopyBS += size;
+				cnt++;
+			}else {
+				prj.prjs.totalCopyBSJar +=size;
+			}
 		} finally {
 			if (in != null)
 				in.close();
@@ -188,7 +194,6 @@ public class Copy1 {
 	}
 
 	public static void main(String[] args) throws IOException {
-
 		// test , copy a dir
 		String from = args[0];
 		String to = args[1];

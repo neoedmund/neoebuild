@@ -17,6 +17,7 @@ public class Projects {
 	public int totalJava;
 	public int totalJar;
 	public long totalCopyBS;
+	public long totalCopyBSJar;
 
 	public Projects() {
 		m = new HashMap<String, Prj>();

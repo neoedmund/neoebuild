@@ -18,6 +18,7 @@ public class Exec {
 	}
 
 	List<String> sb;
+	public boolean verbose;
 
 	public void setCmd(String executable) {
 		sb = new ArrayList<>();
@@ -34,7 +35,8 @@ public class Exec {
 	}
 
 	public int execute() throws Exception {
-		if (prj.prjs.verbose) Log.log("[I]" + prj.name + ":Exec:" + sb);
+		if (prj.prjs.verbose || verbose)
+			Log.log("[I]" + prj.name + "@" + prj + ":Exec:" + sb);
 		Process p = new ProcessBuilder().command(sb).start();
 		StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "stderr");
 		StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream(), "stdout");

@@ -2,8 +2,6 @@
 // ver151223, parse LISP-alike(separated by only space, no comma)
 package neoe.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;

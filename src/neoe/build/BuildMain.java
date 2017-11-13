@@ -35,7 +35,7 @@ public class BuildMain {
 		private Set<String> built, toBuild;
 		private Projects prjs;
 		private int turnNo;
-		private Project1 project;
+		// private Project1 project;
 		private Map param;
 		String destDir;
 
@@ -89,7 +89,7 @@ public class BuildMain {
 				int i = 0;
 				Map<Long, Prj> namemap = new HashMap();
 				for (String n : turn) {
-					final Prj prj = prjs.m.get(n);
+					Prj prj = prjs.m.get(n);
 					Thread t = new Thread() {
 						public void run() {
 							try {
@@ -100,9 +100,9 @@ public class BuildMain {
 							}
 						}
 					};
+					namemap.put(t.getId(), prj);
 					t.start();
 					ts[i++] = t;
-					namemap.put(t.getId(), prj);
 				}
 				for (Thread t : ts) {
 					t.join();
@@ -115,7 +115,7 @@ public class BuildMain {
 					}
 				}
 			}
-			log("Turn [" + turnNo + "] finish");
+			log(String.format("Turn [%d] %s projects finish", turnNo, turn.size()));
 		}
 
 		public void buildPrj(Prj prj) throws Exception {
@@ -125,13 +125,16 @@ public class BuildMain {
 			File path = addPath(prjs.baseDir, prj.dir);
 
 			// log("Path="+path.getCanonicalPath());
-			project = new Project1(prjs);
+			Project1 project = new Project1(prjs);
 			project.setName(prjName);
 			File buildDir = new File(path.getCanonicalPath() + "/build");
 			Path1 cp = new Path1(project);
 			buildDir.mkdirs();
-			for (Object srco : prj.getSrcDir()) {
-				String src = (String) srco;
+			Path1 srcdirs = new Path1(project);
+			srcdirs.sub.addAll(prj.getSrcDir());
+			srcdirs.basePath = path.getAbsolutePath();
+			int cnt = 0;
+			{
 				Javac1 javac = new Javac1();
 				javac.setProject(project);
 				javac.setExecutable(prjs.javaHome + (FindJDK.isWindows ? "/bin/javac.exe" : "/bin/javac"));
@@ -141,12 +144,11 @@ public class BuildMain {
 				javac.setEncoding(getParam("encoding", "utf-8"));
 				javac.setDebug(Boolean.valueOf(getParam("debug", "false")));
 				javac.setOpt((List) param.get("javac_opt"));
-				File srcDir = new File(path.getCanonicalPath(), src);
-				if (!srcDir.exists()) {
-					throw new RuntimeException("src dir not found:" + srcDir.getCanonicalPath());
-				}
-				javac.setSrcdir(srcDir.getCanonicalPath());
-
+				// File srcDir = new File(path.getCanonicalPath(), src);
+				// if (!srcDir.exists()) {
+				// throw new RuntimeException("src dir not found:" + srcDir.getCanonicalPath());
+				// }
+				javac.setSrcdir(srcdirs);
 				javac.setDestdir(buildDir.getCanonicalPath());
 
 				if (prj.cp != null) {
@@ -179,11 +181,14 @@ public class BuildMain {
 				javac.setClasspath(cp);
 				// javac.setCompiler("javac1.7");
 				// javac.setFork(true);
-				int cnt = javac.execute();
+				cnt = javac.execute();
 				if (cnt < 0) {
 					throw new RuntimeException("javac failed with code:" + cnt);
 				}
-
+			}
+			int cnt2 = 0;
+			for (Object srco : srcdirs.sub) {
+				String src = (String) srco;
 				// copy resources
 				Copy1 copy = new Copy1();
 				copy.setProject(project);
@@ -193,22 +198,26 @@ public class BuildMain {
 				fs.setExcludesEndsWith(".java");
 				fs.ignoreEclipsePrjFile = true;
 				copy.addFileset(fs);
-				int cnt2 = copy.execute();
-				log(String.format("%s:copy %d resources", prjName, cnt2));
+				cnt2 += copy.execute();
 			}
+			log(String.format("%s:copy %d resources", prjName, cnt2));
 
-			Jar1 jar = new Jar1();
-			jar.setProject(project);
 			File jarFile = new File(path.getCanonicalPath() + "/dist/" + prjName + ".jar");
-			jarFile.getParentFile().mkdirs();
-			jar.setDestFile(jarFile);
-			jar.setBasedir(buildDir);
-			if (prj.mainClass != null) {
-				jar.addConfiguredManifest("Main-Class", prj.mainClass);
+			if (jarFile.exists() && cnt2 == 0 && cnt == 0) {
+				// pass
+			} else {
+				Jar1 jar = new Jar1();
+				jar.setProject(project);
+				jarFile.getParentFile().mkdirs();
+				jar.setDestFile(jarFile);
+				jar.setBasedir(buildDir);
+				if (prj.mainClass != null) {
+					jar.addConfiguredManifest("Main-Class", prj.mainClass);
+				}
+				jar.execute();
+				// log(prjName+":build finish");
+				copyTo(prj, destDir, project);
 			}
-			jar.execute();
-			// log(prjName+":build finish");
-			copyTo(prj, destDir);
 
 			if (prj.run != null) {
 				Java1 run = new Java1();
@@ -261,19 +270,19 @@ public class BuildMain {
 			}
 		}
 
-		public void copyTo(Prj prj, String dest) throws IOException {
+		public void copyTo(Prj prj, String dest, Project1 project) throws IOException {
 			File destDir = addPath(prjs.baseDir, dest);
 			destDir.mkdirs();
 			// for (Prj prj : prjs.m.values()) {
 			String path = addPath(prjs.baseDir, prj.dir).getCanonicalPath();
 			Copy1 copy = new Copy1();
+			copy.isCopyJar = true;
 			copy.setProject(project);
-			copy.setFile(new File(path + "/dist/" + prj.name + ".jar"));
+			File jf = new File(path + "/dist/" + prj.name + ".jar");
+			copy.setFile(jf);
 			copy.setTodir(destDir);
 			int cnt = copy.execute();
-			// }
-			if (cnt > 0)
-				log(prj.name + ":jar copied to " + dest);
+			log(prj.name + ":jar copied to " + jf.getAbsolutePath());
 			if (prj.cp != null)
 				for (Object o : prj.cp) {
 					// also copy cp jars
@@ -293,11 +302,9 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v11h8".toString();
+	public static final String VER = "v11h13d".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
-		if (lv == 0)
-			log("delete " + path.getCanonicalPath());
 		if (path.exists()) {
 			File[] files = path.listFiles();
 			for (int i = 0; i < files.length; i++) {
@@ -408,7 +415,7 @@ public class BuildMain {
 		}
 		Object prjs = param.get("prjs");
 		Projects prjs1 = new Projects();
-		prjs1.verbose = true;
+		prjs1.verbose = false;
 		prjs1.addPrjs((List) prjs);
 		prjs1.baseDir = args.length == 0 ? "." : addPath(new File(args[0]).getParent(), pb1).getCanonicalPath();
 		prjs1.javaHome = javaHome;
@@ -418,8 +425,10 @@ public class BuildMain {
 			new BuildAll(param).clean(prjs1);
 		new BuildAll(param).build(prjs1, destDir);
 		long t2 = System.currentTimeMillis();
-		log(String.format("program end. in %,d ms, javac(compiled):%,d, copy:%,d(%,d bytes), jar:%,d, java(exec):%,d.",
-				t2 - t1, prjs1.totalJavac, prjs1.totalCopy, prjs1.totalCopyBS, prjs1.totalJar, prjs1.totalJava));
+		log(String.format(
+				"program end. in %,d ms, javac(compiled):%,d, copy:%,d(%,d bytes), jar:%,d(%,d bytes), java-exec:%,d.",
+				t2 - t1, prjs1.totalJavac, prjs1.totalCopy, prjs1.totalCopyBS, prjs1.totalJar, prjs1.totalCopyBSJar,
+				prjs1.totalJava));
 	}
 
 	private static void installInitBuildScript() throws Exception {

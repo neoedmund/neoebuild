@@ -7,11 +7,12 @@ import neoe.util.FindJDK;
 
 public class Path1 {
 
-//	private Project1 prj;
-	private List<String> sub;
+	// private Project1 prj;
+	public List<String> sub;
+	public String basePath;
 
 	public Path1(Project1 project) {
-//		this.prj = project;
+		// this.prj = project;
 		sub = new ArrayList<String>();
 	}
 
@@ -31,9 +32,14 @@ public class Path1 {
 			if (sb.length() > 0) {
 				sb.append(sep);
 			}
-			if (FindJDK.isWindows) sb.append('"');
+			if (FindJDK.isWindows)
+				sb.append('"');
+			if (basePath != null) {
+				sb.append(basePath).append('/');
+			}
 			sb.append(p1);
-			if (FindJDK.isWindows) sb.append('"');
+			if (FindJDK.isWindows)
+				sb.append('"');
 		}
 		return sb.toString();
 	}

@@ -12,7 +12,7 @@ public class Javac1 {
 	String source;
 	String encoding;
 	boolean debug;
-	String srcdir;
+	Path1 srcdir;
 	String destdir;
 	String executable;
 
@@ -49,6 +49,7 @@ public class Javac1 {
 
 	public int execute() throws Exception {
 		Exec exec = new Exec(prj);
+		// exec.verbose = true;
 		exec.setCmd(executable);
 		if (opt != null) {
 			for (Object o : opt) {
@@ -72,7 +73,10 @@ public class Javac1 {
 			exec.addArg("-source", source);
 		}
 		if (srcdir != null) {
-			exec.addArg("-sourcepath", enclosePath(srcdir));
+			// exec.addArg("-sourcepath", enclosePath(srcdir));
+			String s = srcdir.toCommandlineString();
+			if (!s.isEmpty())
+				exec.addArg("-sourcepath", enclosePath(s));
 		}
 		if (target != null) {
 			exec.addArg("-target", target);
@@ -85,9 +89,9 @@ public class Javac1 {
 		}
 
 		File f = U.getTempFile("filelist");
-		int cnt = U.writeFileList(f, new File(srcdir), new File(destdir));
+		int cnt = U.writeFileList(f, srcdir, new File(destdir));
 		if (cnt == 0) {
-			Log.log(prj.name + ":nothing to compile.");
+			Log.log(prj.name + ":javac 0 file");
 			f.delete();
 			return cnt;
 		} else {
@@ -114,7 +118,7 @@ public class Javac1 {
 		this.prj = prj;
 	}
 
-	public void setSrcdir(String string) {
+	public void setSrcdir(Path1 string) {
 		this.srcdir = string;
 	}
 
