@@ -45,11 +45,13 @@ public class Copy1 {
 	private long t1, totalCopyBS, lastSizeDiv, lastBs, t0, lastCntDiv;
 	private boolean debugSpeed;
 	public boolean isCopyJar;
+	int cntjar;
 
 	public int execute() throws IOException {
 		t0 = t1 = System.currentTimeMillis();
 		totalCopyBS = 0;
 		cnt = 0;
+		cntjar = 0;
 		if (file != null) {
 			copyFile(file);
 		}
@@ -58,7 +60,7 @@ public class Copy1 {
 		}
 		prj.prjs.totalCopy += cnt;
 		prj.prjs.totalSkipResource += prj.skipResource;
-		return cnt;
+		return cnt + cntjar;
 	}
 
 	private void copyFileSet(FileSet1 fs1) throws IOException {
@@ -164,7 +166,10 @@ public class Copy1 {
 				cnt++;
 			} else {
 				prj.prjs.totalCopyBSJar += size;
+				prj.prjs.totalCopyJar++;
+				cntjar++;
 			}
+
 		} finally {
 			if (in != null)
 				in.close();

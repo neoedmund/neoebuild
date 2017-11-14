@@ -20,6 +20,7 @@ public class Projects {
 	public int totalJar;
 	public long totalCopyBS;
 	public long totalCopyBSJar;
+	public int totalCopyJar;
 
 	public Projects() {
 		m = new HashMap<String, Prj>();
