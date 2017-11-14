@@ -221,9 +221,9 @@ public class BuildMain {
 					jar.addConfiguredManifest("Main-Class", prj.mainClass);
 				}
 				jar.execute();
-				// log(prjName+":build finish");
-				copyTo(prj, destDir, project);
 			}
+			// log(prjName+":build finish");
+			copyTo(prj, destDir, project);
 
 			if (prj.run != null) {
 				Java1 run = new Java1();
@@ -288,7 +288,8 @@ public class BuildMain {
 			copy.setFile(jf);
 			copy.setTodir(destDir);
 			int cnt = copy.execute();
-			log(prj.name + ":jar copied to " + jf.getAbsolutePath());
+			if (cnt > 0)
+				log(prj.name + ":jar copied to " + jf.getAbsolutePath());
 			if (prj.cp != null)
 				for (Object o : prj.cp) {
 					// also copy cp jars
@@ -308,7 +309,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v11h13e".toString();
+	public static final String VER = "v11h14".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (path.exists()) {
