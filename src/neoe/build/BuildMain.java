@@ -128,12 +128,22 @@ public class BuildMain {
 			// log("Path="+path.getCanonicalPath());
 			Project1 project = new Project1(prjs);
 			project.setName(prjName);
-			File buildDir = new File(path.getCanonicalPath() + "/build");
-			Path1 cp = new Path1(project);
-			buildDir.mkdirs();
+			{// check srcdirs
+				for (Object o : prj.getSrcDir()) {
+					File f = new File(path, o.toString());
+					if (!f.exists()) {
+						throw new RuntimeException("source dir not exists:" + f.getAbsolutePath());
+					}
+				}
+			}
 			Path1 srcdirs = new Path1(project);
 			srcdirs.sub.addAll(prj.getSrcDir());
 			srcdirs.basePath = path.getAbsolutePath();
+
+			File buildDir = new File(path.getCanonicalPath() + "/build");
+			Path1 cp = new Path1(project);
+			buildDir.mkdirs();
+
 			int cnt = 0;
 			{
 				Javac1 javac = new Javac1();
@@ -309,7 +319,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v11h14".toString();
+	public static final String VER = "v11h15".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (path.exists()) {
