@@ -1,10 +1,12 @@
 { /* neoebuild script */
-baseDir:"."
-prjs:[
- [this_project_name, "." , { /* srcDir:["src/java" "src/resources"] */ dep:[ /* depending projects */]  cp:[ /*classpaths*/ ] /* main:"main-class-name" */}]
- /* other projects */
-]
+/* default
+baseDir:"."   
 destDir:"dist"
-target:8
-source:8
+debug:false	target:8	source:8
+*/
+prjs:[
+/* [project_name, "rel-path" , { srcDir:["src/java" "src/resources"]  dep:[  depending projects ]  cp:[ classpaths ]  main:"main-class-name" }] */
+/* other projects */
+[project_name, "." , {  srcDir:["src/java" "src/resources"]  dep:[ ]  cp:[ ] }]
+]
 }

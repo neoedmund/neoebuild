@@ -145,6 +145,7 @@ public class BuildMain {
 			buildDir.mkdirs();
 
 			int cnt = 0;
+
 			{
 				Javac1 javac = new Javac1();
 				javac.setProject(project);
@@ -197,27 +198,28 @@ public class BuildMain {
 					throw new RuntimeException("javac failed with code:" + cnt);
 				}
 
-				String[] cntAndSkip = U.getCntAndSkip(cnt, project.skipJavac);
-				Log.log(String.format("%s:javac %s%s", prj.name, cntAndSkip[0], cntAndSkip[1]));
+				String[] cntAndSkipJavac = U.getCntAndSkip(cnt, project.skipJavac);
+				Log.log(String.format("%s:javac %s%s", prj.name, cntAndSkipJavac[0], cntAndSkipJavac[1]));
 
 			}
 			int cnt2 = 0;
-			for (Object srco : srcdirs.sub) {
-				String src = (String) srco;
-				// copy resources
-				Copy1 copy = new Copy1();
-				copy.setProject(project);
-				copy.setTodir(buildDir);
-				FileSet1 fs = new FileSet1();
-				fs.setDir(new File(path.getCanonicalPath(), src));
-				fs.setExcludesEndsWith(".java");
-				fs.ignoreEclipsePrjFile = true;
-				copy.addFileset(fs);
-				cnt2 += copy.execute();
+			{
+				for (Object srco : srcdirs.sub) {
+					String src = (String) srco;
+					// copy resources
+					Copy1 copy = new Copy1();
+					copy.setProject(project);
+					copy.setTodir(buildDir);
+					FileSet1 fs = new FileSet1();
+					fs.setDir(new File(path.getCanonicalPath(), src));
+					fs.setExcludesEndsWith(".java");
+					fs.ignoreEclipsePrjFile = true;
+					copy.addFileset(fs);
+					cnt2 += copy.execute();
+				}
+				String[] cntAndSkipRes = U.getCntAndSkip(cnt2, project.skipResource);
+				Log.log(String.format("%s:copy resource %s%s", prj.name, cntAndSkipRes[0], cntAndSkipRes[1]));
 			}
-			String[] cntAndSkip = U.getCntAndSkip(cnt2, project.skipResource);
-			Log.log(String.format("%s:copy resource %s%s", prj.name, cntAndSkip[0], cntAndSkip[1]));
-
 			File jarFile = new File(path.getCanonicalPath() + "/dist/" + prjName + ".jar");
 			if (jarFile.exists() && cnt2 == 0 && cnt == 0) {
 				// pass
@@ -319,7 +321,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v11h15".toString();
+	public static final String VER = "v11h16a".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (path.exists()) {

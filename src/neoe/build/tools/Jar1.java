@@ -42,13 +42,13 @@ public class Jar1 {
 		exec.setCmd(prj.prjs.javaHome + (FindJDK.isWindows ? "/bin/jar.exe" : "/bin/jar"));
 		// jar cvfm classes.jar mymanifest -C foo/ .
 		int code;
-		if (manifest.isEmpty()) {
-			exec.addArg("cf");
-			exec.addArg(dest.getCanonicalPath());
-			exec.addArg("-C", base.getCanonicalPath());
-			exec.addArg(".");
-			code=exec.execute();
-		} else {
+//		if (manifest.isEmpty()) {
+//			exec.addArg("cf");
+//			exec.addArg(dest.getCanonicalPath());
+//			exec.addArg("-C", base.getCanonicalPath());
+//			exec.addArg(".");
+//			code=exec.execute();
+//		} else {
 			exec.addArg("cfm");
 			exec.addArg(dest.getCanonicalPath());
 			File mf = U.getTempFile("manifest");
@@ -58,7 +58,7 @@ public class Jar1 {
 			exec.addArg(".");
 			code=exec.execute();
 			mf.delete();
-		}
+//		}
 		if (code<0){
 			throw new RuntimeException("Jar failed with code:"+code);
 		}
