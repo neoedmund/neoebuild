@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import neoe.build.tools.Copy1;
 import neoe.build.tools.FileSet1;
@@ -85,7 +86,7 @@ public class BuildMain {
 					buildPrj(prj);
 				}
 			} else {
-				final Map<Long, Boolean> success = new HashMap<Long, Boolean>();
+				final Map<Long, Boolean> success = new ConcurrentHashMap<Long, Boolean>();
 				Thread[] ts = new Thread[turn.size()];
 				int i = 0;
 				Map<Long, Prj> namemap = new HashMap();
@@ -321,7 +322,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v11h16a".toString();
+	public static final String VER = "v12h22".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (path.exists()) {
