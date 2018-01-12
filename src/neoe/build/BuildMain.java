@@ -165,22 +165,10 @@ public class BuildMain {
 				javac.setDestdir(buildDir.getCanonicalPath());
 
 				if (prj.cp != null) {
-					for (Object o : prj.cp) {
-						File f1 = addPath(prjs.baseDir, o.toString());
-						if (f1.isDirectory()) {
-							// v1.5 : cp can be dir ,eg lib dir
-							File[] fs = f1.listFiles();
-							for (File f : fs) {
-								if (f.getName().endsWith(".jar")) {
-									// log("[D]add
-									// "+f.getCanonicalPath());
-									cp.add(f.getCanonicalPath());
-								}
-							}
-						} else {
-							cp.add(addPath(prjs.baseDir, o.toString()).getCanonicalPath());
-						}
-					}
+					addCP(cp, prj.cp);
+				}
+				if (prj.cp2 != null) {
+					addCP(cp, prj.cp2);
 				}
 				if (prj.depends != null) {
 					for (Object d : prj.depends) {
@@ -246,11 +234,33 @@ public class BuildMain {
 				for (Object o : prj.run) {
 					List row = (List) o;
 					run.setClassname((String) row.get(0));
-					for (Object o1 : (List) row.get(2)) {
+					for (Object o1 : (List) row.get(1)) {
 						run.addArg(o1.toString());
 					}
 					run.execute();
 				}
+			}
+		}
+
+		private void addCP(Path1 cp, List cps) throws IOException {
+			for (Object o : cps) {
+				File f1 = addPath(prjs.baseDir, o.toString());
+				if (f1.isDirectory()) {
+					// v1.5 : cp can be dir ,eg lib dir
+					File[] fs = f1.listFiles();
+					for (File f : fs) {
+						if (f.getName().endsWith(".jar")) {
+							// log("[D]add
+							// "+f.getCanonicalPath());
+							cp.add(f.getCanonicalPath());
+						}
+					}
+				} else if (f1.isFile()) {
+					cp.add(addPath(prjs.baseDir, o.toString()).getCanonicalPath());
+				} else {
+					throw new RuntimeException("cp file not exists:" + f1);
+				}
+
 			}
 		}
 
@@ -322,7 +332,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "v12h22".toString();
+	public static final String VER = "1i12b".toString();
 
 	static public boolean deleteDirectory(File path, int lv) throws IOException {
 		if (path.exists()) {
@@ -367,7 +377,7 @@ public class BuildMain {
 		public String name;
 		public String dir;
 		public List depends;
-		public List cp;
+		public List cp, cp2;
 		public List run;
 		public List srcDir;
 

@@ -36,6 +36,7 @@ public class Java1 {
 		e.setCmd(prj.prjs.javaHome + (FindJDK.isWindows ? "/bin/java.exe" : "/bin/java"));
 		if (cp != null) {
 			e.addArg("-cp", cp.toCommandlineString());
+			// System.out.println("cp=" + s);
 		}
 		if (clsName != null) {
 			e.addArg(clsName);

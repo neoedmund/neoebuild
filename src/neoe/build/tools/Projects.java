@@ -40,6 +40,7 @@ public class Projects {
 				Map m = (Map) list.get(2);
 				prj.depends = (List) m.get("dep");
 				prj.cp = (List) m.get("cp");
+				prj.cp2 = (List) m.get("cp2");
 				prj.mainClass = (String) m.get("main");
 				prj.run = (List) m.get("run");
 				prj.srcDir = (List) m.get("srcDir");
