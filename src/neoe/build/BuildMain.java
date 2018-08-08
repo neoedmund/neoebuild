@@ -91,7 +91,7 @@ public class BuildMain {
 				int i = 0;
 				Map<Long, Prj> namemap = new HashMap();
 				for (String n : turn) {
-					Prj prj = prjs.m.get(n);
+					final Prj prj = prjs.m.get(n);
 					Thread t = new Thread() {
 						public void run() {
 							try {

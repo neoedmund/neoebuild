@@ -1,5 +1,7 @@
 {
 baseDir:".",
+source:7
+targe:7
 prjs:[
  [neoebuild,. , {main:"neoe.build.BuildMain"}]
 ],
