@@ -1,12 +1,11 @@
 {
-baseDir:".",
-source:7
-target:7
+baseDir:"."
+/* source:7 target:7 */
 prjs:[
- [neoebuild,. , {main:"neoe.build.BuildMain"}]
-],
-destDir:".",
+ [neoebuild .   {main:"neoe.build.BuildMain"}]
+]
+destDir:"."
 debug:true
-javac_opt: ["-Xlint:deprecation"  /* "-Xlint:unchecked" */ ]
+javac_opt: ["--release"  "8" ]
 }
 
