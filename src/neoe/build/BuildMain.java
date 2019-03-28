@@ -294,9 +294,12 @@ public class BuildMain {
 		public void clean(Projects prjs) throws IOException {
 			for (Prj prj : prjs.m.values()) {
 				String path = addPath(prjs.baseDir, prj.dir).getCanonicalPath();
-				deleteDirectory(new File(path + "/dist"), 0);
-				deleteDirectory(new File(path + "/build"), 0);
+				deleteDirectory(new File(path + "/dist"), 0, null);
+				deleteDirectory(new File(path + "/build"), 0, null);
 			}
+			log("destDir=" + destDir);
+			if (!".".equals(destDir) && destDir != null && destDir.length() > 0)
+				deleteDirectory(addPath(prjs.baseDir, destDir), 0, ".jar");
 		}
 
 		public void copyTo(Prj prj, String dest, Project1 project) throws IOException {
@@ -332,22 +335,26 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "1j11".toString();
+	public static final String VER = "3j28".toString();
 
-	static public boolean deleteDirectory(File path, int lv) throws IOException {
+	static public boolean deleteDirectory(File path, int lv, String filter) throws IOException {
 		if (path.exists()) {
 			File[] files = path.listFiles();
 			for (int i = 0; i < files.length; i++) {
 				if (files[i].isDirectory()) {
-					deleteDirectory(files[i], lv + 1);
+					deleteDirectory(files[i], lv + 1, filter);
 				} else {
-					files[i].delete();
+					if (filter == null || filter.isEmpty() || files[i].getName().contains(filter)) {
+						files[i].delete();
+					}
 				}
 			}
 		}
 		if (lv == 0)
 			log("delete " + path.getCanonicalPath() + " " + path.delete());
-		return path.delete();
+		if (filter == null || filter.isEmpty() || path.getName().contains(filter))
+			path.delete();
+		return true;
 	}
 
 	public static String join(String delima, List list) {
@@ -449,11 +456,12 @@ public class BuildMain {
 		prjs1.addPrjs((List) prjs);
 		prjs1.baseDir = args.length == 0 ? "." : addPath(new File(args[0]).getParent(), pb1).getCanonicalPath();
 		prjs1.javaHome = javaHome;
-
 		long t1 = System.currentTimeMillis();
+		BuildAll buildall = new BuildAll(param);
+		buildall.destDir = destDir;
 		if (args.length > 1 && args[1].equals("clean"))
-			new BuildAll(param).clean(prjs1);
-		new BuildAll(param).build(prjs1, destDir);
+			buildall.clean(prjs1);
+		buildall.build(prjs1, destDir);
 		long t2 = System.currentTimeMillis();
 		log(String.format(
 				"program end. in %,d ms, javac:%,d(skip %,d), copy:%,d(skip %,d) %,d bytes, jar:%,d(%,d bytes), java-exec:%,d.",
