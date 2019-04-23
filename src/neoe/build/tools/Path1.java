@@ -3,7 +3,7 @@ package neoe.build.tools;
 import java.util.ArrayList;
 import java.util.List;
 
-import neoe.util.FindJDK;
+import neoe.build.util.FindJDK;
 
 public class Path1 {
 

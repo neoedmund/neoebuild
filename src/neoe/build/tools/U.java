@@ -9,8 +9,8 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import neoe.build.BuildMain;
-import neoe.util.FileIterator;
-import neoe.util.Log;
+import neoe.build.util.FileIterator;
+import neoe.build.util.Log;
 
 public class U {
 	public static final long ignoreMs = 20;

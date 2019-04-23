@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import neoe.util.FindJDK;
+import neoe.build.util.FindJDK;
 
 public class Jar1 {
 

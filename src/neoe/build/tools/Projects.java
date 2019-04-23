@@ -44,6 +44,7 @@ public class Projects {
 				prj.mainClass = (String) m.get("main");
 				prj.run = (List) m.get("run");
 				prj.srcDir = (List) m.get("srcDir");
+				prj.res = !"false".equals(m.get("res"));
 			}
 		}
 	}

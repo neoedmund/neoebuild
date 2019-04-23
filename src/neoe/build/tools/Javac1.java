@@ -3,7 +3,7 @@ package neoe.build.tools;
 import java.io.File;
 import java.util.List;
 
-import neoe.util.Log;
+import neoe.build.util.Log;
 
 public class Javac1 {
 	Project1 prj;

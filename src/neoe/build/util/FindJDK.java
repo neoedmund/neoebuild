@@ -1,4 +1,4 @@
-package neoe.util;
+package neoe.build.util;
 
 import java.io.File;
 import java.io.IOException;

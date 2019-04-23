@@ -3,7 +3,7 @@ package neoe.build.tools;
 import java.io.File;
 import java.util.Iterator;
 
-import neoe.util.FileIterator;
+import neoe.build.util.FileIterator;
 
 public class FileSet1 implements Iterable<File> {
 

@@ -25,10 +25,10 @@ import neoe.build.tools.Path1;
 import neoe.build.tools.Project1;
 import neoe.build.tools.Projects;
 import neoe.build.tools.U;
-import neoe.util.FileUtil;
-import neoe.util.FindJDK;
-import neoe.util.Log;
-import neoe.util.PyData;
+import neoe.build.util.FileUtil;
+import neoe.build.util.FindJDK;
+import neoe.build.util.Log;
+import neoe.build.util.PyData;
 
 public class BuildMain {
 
@@ -192,7 +192,7 @@ public class BuildMain {
 
 			}
 			int cnt2 = 0;
-			{
+			if (prj.res){
 				for (Object srco : srcdirs.sub) {
 					String src = (String) srco;
 					// copy resources
@@ -387,6 +387,7 @@ public class BuildMain {
 		public List cp, cp2;
 		public List run;
 		public List srcDir;
+		public boolean res;
 
 		public List getSrcDir() {
 			if (srcDir == null || srcDir.isEmpty())
