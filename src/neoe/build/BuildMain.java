@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +27,7 @@ import neoe.build.tools.Path1;
 import neoe.build.tools.Project1;
 import neoe.build.tools.Projects;
 import neoe.build.tools.U;
+import neoe.build.util.FileIterator;
 import neoe.build.util.FileUtil;
 import neoe.build.util.FindJDK;
 import neoe.build.util.Log;
@@ -192,7 +195,7 @@ public class BuildMain {
 
 			}
 			int cnt2 = 0;
-			if (prj.res){
+			if (prj.res) {
 				for (Object srco : srcdirs.sub) {
 					String src = (String) srco;
 					// copy resources
@@ -247,13 +250,16 @@ public class BuildMain {
 				File f1 = addPath(prjs.baseDir, o.toString());
 				if (f1.isDirectory()) {
 					// v1.5 : cp can be dir ,eg lib dir
-					File[] fs = f1.listFiles();
-					for (File f : fs) {
+//					File[] fs = f1.listFiles();
+					List<File> fs = new ArrayList<File>();
+					for (File f : new FileIterator(f1.getAbsolutePath())) {
 						if (f.getName().endsWith(".jar")) {
-							// log("[D]add
-							// "+f.getCanonicalPath());
-							cp.add(f.getCanonicalPath());
+							fs.add(f);
 						}
+					}
+					Collections.sort(fs);
+					for (File f : fs) {
+						cp.add(f.getCanonicalPath());
 					}
 				} else if (f1.isFile()) {
 					cp.add(addPath(prjs.baseDir, o.toString()).getCanonicalPath());
@@ -321,7 +327,7 @@ public class BuildMain {
 					// also copy cp jars
 					File f = addPath(prjs.baseDir, o.toString());
 					if (f.isDirectory()) { // v1.5
-						for (File f1 : f.listFiles()) {
+						for (File f1 : new FileIterator(f.getAbsolutePath())) {
 							if (f1.getName().endsWith(".jar")) {
 								copy.setFile(f1);
 								copy.execute();
@@ -335,7 +341,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "3j28".toString();
+	public static final String VER = "cj3b".toString();
 
 	static public boolean deleteDirectory(File path, int lv, String filter) throws IOException {
 		if (path.exists()) {
