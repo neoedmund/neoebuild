@@ -341,7 +341,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "cj3b".toString();
+	public static final String VER = "cj18".toString();
 
 	static public boolean deleteDirectory(File path, int lv, String filter) throws IOException {
 		if (path.exists()) {
@@ -459,7 +459,14 @@ public class BuildMain {
 		}
 		Object prjs = param.get("prjs");
 		Projects prjs1 = new Projects();
-		prjs1.verbose = false;
+		{
+			String s = (String) param.get("verbose");
+			if (s == null || s.length() == 0) {
+				prjs1.verbose = false;
+			} else {
+				prjs1.verbose = Boolean.valueOf(s);
+			}
+		}
 		prjs1.addPrjs((List) prjs);
 		prjs1.baseDir = args.length == 0 ? "." : addPath(new File(args[0]).getParent(), pb1).getCanonicalPath();
 		prjs1.javaHome = javaHome;

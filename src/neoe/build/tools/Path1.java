@@ -44,4 +44,14 @@ public class Path1 {
 		return sb.toString();
 	}
 
+	public void addArg(Exec exec, String arg) {
+		for (String p1 : sub) {
+			if (basePath != null) {
+				exec.addArg(arg, Javac1.enclosePath(basePath + "/" + p1));
+			} else {
+				exec.addArg(arg, Javac1.enclosePath(p1));
+			}
+		}
+	}
+
 }

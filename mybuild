@@ -7,5 +7,6 @@ prjs:[
 destDir:"."
 debug:true
 javac_opt: ["--release"  "8" ]
+verbose:true
 }
 

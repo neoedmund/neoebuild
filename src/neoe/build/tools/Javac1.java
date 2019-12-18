@@ -60,11 +60,6 @@ public class Javac1 {
 			exec.addArg("-g:none");
 		}
 
-		if (destdir != null) {
-			new File(destdir).mkdirs();
-			exec.addArg("-d", enclosePath(destdir));
-		}
-
 		if (encoding != null) {
 			exec.addArg("-encoding", encoding);
 		}
@@ -72,20 +67,24 @@ public class Javac1 {
 		if (source != null) {
 			exec.addArg("-source", source);
 		}
+		if (target != null) {
+			exec.addArg("-target", target);
+		}
+		if (destdir != null) {
+			new File(destdir).mkdirs();
+			exec.addArg("-d", enclosePath(destdir));
+		}
 		if (srcdir != null) {
 			// exec.addArg("-sourcepath", enclosePath(srcdir));
 			String s = srcdir.toCommandlineString();
 			if (!s.isEmpty())
-				exec.addArg("-sourcepath", enclosePath(s));
-		}
-		if (target != null) {
-			exec.addArg("-target", target);
+				exec.addArg("-sourcepath", s);
 		}
 
 		if (classpath != null) {
 			String cp = classpath.toCommandlineString();
 			if (!cp.isEmpty())
-				exec.addArg("-cp", enclosePath(cp));
+				exec.addArg("-cp", cp);
 		}
 
 		File f = U.getTempFile("filelist");
@@ -96,7 +95,7 @@ public class Javac1 {
 			f.delete();
 			return 0;
 		}
-		exec.addArg(enclosePath("@" + f.getCanonicalPath()));
+		exec.addArg("@" + f.getCanonicalPath());
 		int code = exec.execute();
 		f.delete();
 		if (code != 0) {
@@ -106,10 +105,10 @@ public class Javac1 {
 	}
 
 	public static String enclosePath(String s) {
-		int p1 = s.indexOf(' ');
-		if (p1 < 0)
+//		int p1 = s.indexOf(' ');
+//		if (p1 < 0)
 			return s;
-		return "\"" + s + "\"";
+//		return "\"" + s + "\"";
 	}
 
 	public void setProject(Project1 prj) {
