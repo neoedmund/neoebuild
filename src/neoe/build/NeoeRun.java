@@ -30,7 +30,7 @@ public class NeoeRun {
 			int p1 = path . lastIndexOf( "/" ) ;
 			String name = path . substring( p1 + 1 ) ;
 			if ( prjname == null ) {
-				System . out . println( "name:" +  name ) ;
+				System . out . println( "path:" +  path ) ;
 			} else {
 				if ( name . equalsIgnoreCase( prjname ) ) {
 					if ( prjPath == null ) {
