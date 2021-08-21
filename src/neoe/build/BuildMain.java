@@ -341,7 +341,7 @@ public class BuildMain {
 		}
 	}
 
-	public static final String VER = "cj18".toString();
+	public static final String VER = "8A21".toString();
 
 	static public boolean deleteDirectory(File path, int lv, String filter) throws IOException {
 		if (path.exists()) {
@@ -433,6 +433,10 @@ public class BuildMain {
 		System.out.println("args:" + Arrays.toString(args));
 		if (args.length > 0 && "-init".equals(args[0])) {
 			installInitBuildScript();
+			return;
+		}
+		if (args.length > 0 && "-run".equals(args[0])) {
+			new NeoeRun().run(args);
 			return;
 		}
 		Map param = makeDefaultEmptyConfig(args);
