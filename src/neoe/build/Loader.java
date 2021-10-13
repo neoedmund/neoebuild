@@ -90,7 +90,8 @@ public class Loader {
 				} else {
 					String target = (String) found.iterator().next();
 					System.out.println("Matched: " + target);
-//					Thread.currentThread().setContextClassLoader(cl);
+					System.setProperty("user.dir", new File(libDir).getParentFile().getAbsolutePath());
+					// Thread.currentThread().setContextClassLoader(cl);
 					cl.loadClass(target).getMethod("main", new Class[] { String[].class }).invoke(null,
 							new Object[] { args });
 				}
